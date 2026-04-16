@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Access Portal</title>
+    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            color: #ffffff;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #bg-video {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.60) 100%);
+            backdrop-filter: blur(2px);
+        }
+
+        .page {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 540px;
+            padding: 32px 28px;
+            border-radius: 24px;
+            background: rgba(20, 20, 20, 0.50);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.40);
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 0.3px;
+            background: rgba(255, 255, 255, 0.12);
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: 34px;
+            line-height: 1.2;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 0 auto 26px;
+            max-width: 420px;
+            font-size: 16px;
+            line-height: 1.65;
+            color: rgba(255, 255, 255, 0.88);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 220px;
+            padding: 16px 28px;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #19c37d 0%, #0ea765 100%);
+            color: #fff;
+            font-size: 17px;
+            font-weight: bold;
+            text-decoration: none;
+            box-shadow: 0 12px 30px rgba(25, 195, 125, 0.32);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 34px rgba(25, 195, 125, 0.36);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            opacity: 0.95;
+        }
+
+        .meta {
+            margin-top: 18px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.70);
+        }
+
+        .footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 14px;
+            z-index: 2;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.65);
+            padding: 0 16px;
+        }
+
+        @media (max-width: 640px) {
+            .card {
+                padding: 28px 20px;
+                border-radius: 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            p {
+                font-size: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                min-width: 0;
+            }
+        }
+    </style>
+
+    <script>
+    !function (w, d, t) {
+        w.TiktokAnalyticsObject = t;
+        var ttq = w[t] = w[t] || [];
+        ttq.methods = ["page", "track"];
+        ttq.setAndDefer = function (obj, method) {
+            obj[method] = function () {
+                obj.push([method].concat(Array.prototype.slice.call(arguments, 0)));
+            };
+        };
+        for (var i = 0; i < ttq.methods.length; i++) {
+            ttq.setAndDefer(ttq, ttq.methods[i]);
+        }
+        ttq.load = function (id) {
+            var s = document.createElement("script");
+            s.async = true;
+            s.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + id;
+            var x = document.getElementsByTagName("script")[0];
+            x.parentNode.insertBefore(s, x);
+        };
+        ttq.load("D7EB5URC77UDSGCE2100");
+        ttq.page();
+    }(window, document, "ttq");
+    </script>
+</head>
+<body>
+    <video id="bg-video" autoplay muted loop playsinline>
+        <source src="bg.mp4" type="video/mp4" />
+    </video>
+
+    <div class="overlay"></div>
+
+    <main class="page">
+        <section class="card">
+            <div class="badge">ONLINE ACCESS</div>
+            <h1>เริ่มต้นใช้งานได้ในไม่กี่ขั้นตอน</h1>
+            <p>
+                ระบบกำลังเปิดให้เข้าใช้งานตามลำดับ กรุณาตรวจสอบรายละเอียดและดำเนินการต่อผ่านหน้าถัดไป
+            </p>
+
+            <a class="btn" href="order.html" onclick="ttq.track('ClickButton')">
+                ดำเนินการต่อ
+            </a>
+
+            <div class="meta">รองรับการใช้งานผ่านมือถือและเบราว์เซอร์ทั่วไป</div>
+        </section>
+    </main>
+
+    <div class="footer">
+        © 2026 Online Portal. All rights reserved.
+    </div>
+</body>
+</html>
