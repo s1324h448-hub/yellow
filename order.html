@@ -2,46 +2,48 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>กำลังเปิดหน้าต่อไป - Yellowx888</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Yellowx888 จากดูไบ — กำลังเชื่อมต่อ</title>
     <link rel="shortcut icon" href="logo-yx888.png" type="image/png" />
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="logo-yx888.png" as="image" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;800;900&display=swap" rel="stylesheet">
 
     <!-- TikTok Pixel -->
     <script>
     (function () {
         const PIXEL_ID = "D7EB5URC77UDSGCE2100";
-        const STORAGE_EXTERNAL_ID = "td_external_id";
-        const STORAGE_TTCLID = "td_ttclid";
+        const S_EID = "td_external_id";
+        const S_TTC = "td_ttclid";
 
-        function getParam(name) { return new URLSearchParams(window.location.search).get(name); }
+        function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
 
-        function getOrCreateExternalId() {
-            let id = getParam("external_id") || localStorage.getItem(STORAGE_EXTERNAL_ID);
+        function getOrCreateEid() {
+            let id = getParam("external_id") || localStorage.getItem(S_EID);
             if (!id) id = "td_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 12);
-            localStorage.setItem(STORAGE_EXTERNAL_ID, id);
+            localStorage.setItem(S_EID, id);
             return id;
         }
 
         function captureTtclid() {
-            const ttclid = getParam("ttclid");
-            if (ttclid) { localStorage.setItem(STORAGE_TTCLID, ttclid); return ttclid; }
-            return localStorage.getItem(STORAGE_TTCLID) || "";
+            const t = getParam("ttclid");
+            if (t) { localStorage.setItem(S_TTC, t); return t; }
+            return localStorage.getItem(S_TTC) || "";
         }
 
-        const externalId = getOrCreateExternalId();
+        const externalId = getOrCreateEid();
         const ttclid = captureTtclid();
 
         window.tdTracking = {
             externalId, ttclid,
             goToLine: function (url) {
                 if (typeof ttq !== "undefined") {
+                    ttq.track("Lead", { external_id: externalId, ttclid: ttclid || undefined });
                     ttq.track("CompleteRegistration", { external_id: externalId, ttclid: ttclid || undefined });
                 }
                 const target = new URL(url);
                 if (ttclid) target.searchParams.set("ttclid", ttclid);
                 if (externalId) target.searchParams.set("external_id", externalId);
-                setTimeout(() => { window.location.href = target.toString(); }, 500);
+                setTimeout(() => { window.location.href = target.toString(); }, 400);
             }
         };
 
@@ -64,68 +66,94 @@
     </script>
 
     <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-dark: #B8860B;
+            --gold-light: #F5E27A;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         html, body {
-            min-height: 100vh;
+            width: 100%;
+            min-height: 100svh;
             font-family: 'Kanit', sans-serif;
-            background: radial-gradient(circle at 50% 0%, #1a1400 0%, #0d0d0d 50%, #050505 100%);
+            background: radial-gradient(circle at 50% 0%, #1a1200 0%, #0d0d0d 50%, #050505 100%);
             color: #fff;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 24px 16px;
         }
 
         .card {
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(212,175,55,0.20);
+            border: 1px solid rgba(212,175,55,0.22);
             border-radius: 28px;
-            padding: 32px 24px;
+            padding: 28px 20px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.50), 0 0 40px rgba(212,175,55,0.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(212,175,55,0.05);
         }
 
-        .logo-small {
-            width: 64px;
-            height: 64px;
+        .logo-wrap { margin: 0 auto 14px; }
+
+        .logo-wrap img {
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
             border: 2px solid rgba(212,175,55,0.5);
-            margin: 0 auto 14px;
-            display: block;
+            object-fit: cover;
+            box-shadow: 0 0 20px rgba(212,175,55,0.3);
+            background: #111;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 6px 14px;
+            padding: 5px 14px;
             border-radius: 999px;
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             letter-spacing: 2px;
             background: rgba(212,175,55,0.12);
-            color: #D4AF37;
-            margin-bottom: 16px;
+            color: var(--gold);
+            margin-bottom: 14px;
             text-transform: uppercase;
         }
 
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
+        h1 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
 
-        p {
-            font-size: 14px;
-            color: rgba(255,255,255,0.65);
+        .sub-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
             line-height: 1.6;
-            margin-bottom: 24px;
+            margin-bottom: 18px;
         }
 
-        .progress-wrap {
-            margin-bottom: 10px;
+        .viewers-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.55);
         }
+
+        .viewers-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: blink 1.2s ease-in-out infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+        .viewers-count { color: #4ade80; font-weight: 700; }
+
+        .progress-wrap { margin-bottom: 8px; }
 
         .progress-bar-bg {
             width: 100%;
@@ -147,36 +175,48 @@
 
         .countdown {
             font-size: 13px;
-            color: rgba(255,255,255,0.55);
-            margin: 10px 0 24px;
+            color: rgba(255,255,255,0.5);
+            margin: 8px 0 20px;
         }
 
-        .countdown span {
-            color: #D4AF37;
-            font-weight: 700;
-        }
+        .countdown span { color: var(--gold); font-weight: 800; font-size: 16px; }
 
         .btn-line {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 16px 20px;
+            padding: 17px 20px;
             border-radius: 999px;
             background: linear-gradient(135deg, #F5E27A 0%, #D4AF37 40%, #B8860B 100%);
-            color: #fff;
+            color: #1a1000;
             text-decoration: none;
-            font-size: 18px;
-            font-weight: 700;
+            font-size: 19px;
+            font-weight: 900;
             font-family: 'Kanit', sans-serif;
-            box-shadow: 0 10px 30px rgba(212,175,55,0.45);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+            box-shadow: 0 10px 30px rgba(212,175,55,0.5);
             animation: ctaPulse 2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+            gap: 10px;
+            cursor: pointer;
         }
 
+        .btn-line::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2.5s ease-in-out infinite;
+        }
+
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
+
         @keyframes ctaPulse {
-            0%, 100% { box-shadow: 0 10px 30px rgba(212,175,55,0.45); }
-            50% { box-shadow: 0 14px 40px rgba(212,175,55,0.65); }
+            0%, 100% { box-shadow: 0 10px 30px rgba(212,175,55,0.5); transform: scale(1); }
+            50% { box-shadow: 0 14px 40px rgba(212,175,55,0.7); transform: scale(1.02); }
         }
 
         .line-circle {
@@ -184,25 +224,46 @@
             background: #fff;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            margin-right: 10px; flex-shrink: 0;
+            flex-shrink: 0;
         }
 
         .line-circle svg { width: 20px; height: 20px; fill: #06C755; }
 
-        .note {
-            margin-top: 12px;
-            font-size: 11px;
-            color: rgba(255,255,255,0.40);
+        .trust-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 14px;
         }
+
+        .trust-chip {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.45);
+        }
+
+        .trust-chip svg { width: 12px; height: 12px; fill: var(--gold); }
+
+        .note { margin-top: 14px; font-size: 11px; color: rgba(255,255,255,0.3); }
     </style>
 </head>
 
 <body>
     <div class="card">
-        <img src="logo-yx888.png" class="logo-small" alt="Logo" />
-        <div class="status-badge">Yellowx888</div>
+        <div class="logo-wrap">
+            <img src="logo-yx888.png" alt="Yellowx888" width="72" height="72" />
+        </div>
+        <div class="status-badge">Yellowx888 จากดูไบ</div>
         <h1>กำลังเปิดหน้าต่อไป</h1>
-        <p>กรุณารอสักครู่ ระบบกำลังพาคุณไปยัง LINE โดยอัตโนมัติ</p>
+        <p class="sub-text">ระบบกำลังพาคุณไปยัง LINE<br>เพื่อรับสิทธิ์โดยอัตโนมัติ</p>
+
+        <div class="viewers-row">
+            <div class="viewers-dot"></div>
+            <span>มีคน <span class="viewers-count" id="viewersCount">19</span> คนกำลังดูหน้านี้อยู่</span>
+        </div>
 
         <div class="progress-wrap">
             <div class="progress-bar-bg">
@@ -223,32 +284,54 @@
             <div class="line-circle">
                 <svg viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.047c-.052.312-.252 1.217 1.089.665 1.341-.553 7.235-4.261 9.871-7.298 1.914-2.128 2.079-4.01 2.079-5.7z"/></svg>
             </div>
-            เปิดทันที
+            เปิดทันที — ไม่ต้องรอ
         </a>
+
+        <div class="trust-row">
+            <div class="trust-chip">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                ปลอดภัย 100%
+            </div>
+            <div class="trust-chip">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                ระบบดูไบ
+            </div>
+            <div class="trust-chip">
+                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                รีวิว 4.9★
+            </div>
+        </div>
 
         <div class="note">หากระบบไม่เปิดอัตโนมัติ กดปุ่มด้านบนได้เลย</div>
     </div>
 
     <script>
-        (function () {
-            const targetUrl = "https://lin.ee/wef80Gj";
-            const timerEl = document.getElementById("timer");
-            let seconds = 4;
+    (function () {
+        const targetUrl = "https://lin.ee/wef80Gj";
+        const timerEl = document.getElementById("timer");
+        let seconds = 4;
+        timerEl.textContent = String(seconds);
 
-            timerEl.textContent = String(seconds);
+        const countdown = setInterval(() => {
+            seconds -= 1;
+            timerEl.textContent = String(Math.max(seconds, 0));
+            if (seconds <= 0) {
+                clearInterval(countdown);
+                setTimeout(() => { tdTracking.goToLine(targetUrl); }, 500);
+            }
+        }, 1000);
+    })();
 
-            const countdown = setInterval(() => {
-                seconds -= 1;
-                timerEl.textContent = String(Math.max(seconds, 0));
-
-                if (seconds <= 0) {
-                    clearInterval(countdown);
-                    setTimeout(() => {
-                        tdTracking.goToLine(targetUrl);
-                    }, 600);
-                }
-            }, 1000);
-        })();
+    (function () {
+        const el = document.getElementById("viewersCount");
+        let v = 15 + Math.floor(Math.random() * 12);
+        el.textContent = String(v);
+        setInterval(() => {
+            const delta = Math.random() < 0.5 ? 1 : -1;
+            v = Math.max(10, Math.min(38, v + delta));
+            el.textContent = String(v);
+        }, 4000);
+    })();
     </script>
 </body>
 </html>

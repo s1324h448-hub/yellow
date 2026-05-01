@@ -2,51 +2,55 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Yellowx888 จากดูไบ</title>
     <link rel="shortcut icon" href="logo-yx888.png" type="image/png" />
+
+    <!-- Preload critical assets -->
+    <link rel="preload" href="bg-hero-new.jpg" as="image" />
+    <link rel="preload" href="logo-yx888.png" as="image" />
+
+    <!-- Google Fonts — load only weights used -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;800;900&display=swap" rel="stylesheet">
 
     <!-- TikTok Pixel -->
     <script>
     (function () {
         const PIXEL_ID = "D7EB5URC77UDSGCE2100";
-        const STORAGE_EXTERNAL_ID = "td_external_id";
-        const STORAGE_TTCLID = "td_ttclid";
+        const S_EID = "td_external_id";
+        const S_TTC = "td_ttclid";
 
-        function getParam(name) {
-            return new URLSearchParams(window.location.search).get(name);
-        }
-        function getOrCreateExternalId() {
-            let id = getParam("external_id") || localStorage.getItem(STORAGE_EXTERNAL_ID);
+        function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
+
+        function getOrCreateEid() {
+            let id = getParam("external_id") || localStorage.getItem(S_EID);
             if (!id) id = "td_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 12);
-            localStorage.setItem(STORAGE_EXTERNAL_ID, id);
+            localStorage.setItem(S_EID, id);
             return id;
         }
+
         function captureTtclid() {
-            const ttclid = getParam("ttclid");
-            if (ttclid) { localStorage.setItem(STORAGE_TTCLID, ttclid); return ttclid; }
-            return localStorage.getItem(STORAGE_TTCLID) || "";
+            const t = getParam("ttclid");
+            if (t) { localStorage.setItem(S_TTC, t); return t; }
+            return localStorage.getItem(S_TTC) || "";
         }
 
-        const externalId = getOrCreateExternalId();
+        const externalId = getOrCreateEid();
         const ttclid = captureTtclid();
 
         window.tdTracking = {
             externalId, ttclid,
-            track: function (eventName) {
-                if (typeof ttq !== "undefined") {
-                    ttq.track(eventName, { external_id: externalId, ttclid: ttclid || undefined });
-                }
+            track: function (ev) {
+                if (typeof ttq !== "undefined") ttq.track(ev, { external_id: externalId, ttclid: ttclid || undefined });
             },
             goWithTrack: function (url) {
                 this.track("CompleteRegistration");
                 const target = new URL(url, window.location.href);
                 if (ttclid) target.searchParams.set("ttclid", ttclid);
                 if (externalId) target.searchParams.set("external_id", externalId);
-                setTimeout(() => { window.location.href = target.toString(); }, 400);
+                setTimeout(() => { window.location.href = target.toString(); }, 300);
             }
         };
 
@@ -85,18 +89,46 @@
             background: #0a0a0a;
             color: #fff;
             overflow-x: hidden;
+            padding-bottom: 80px;
         }
+
+        /* ─── URGENCY BANNER ─── */
+        .urgency-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(90deg, #1a0f00 0%, #2d1a00 50%, #1a0f00 100%);
+            border-bottom: 1px solid rgba(212,175,55,0.3);
+            padding: 9px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gold-light);
+            letter-spacing: 0.5px;
+        }
+
+        .urgency-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #ff4444;
+            animation: blink 1s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
 
         /* ─── HERO ─── */
         .hero {
             position: relative;
             width: 100%;
-            min-height: 60vh;
+            min-height: 100svh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
-            padding-bottom: 0;
             overflow: hidden;
         }
 
@@ -105,6 +137,7 @@
             inset: 0;
             background: url('bg-hero-new.jpg') center top / cover no-repeat;
             z-index: 0;
+            will-change: transform;
         }
 
         .hero-overlay {
@@ -113,8 +146,8 @@
             background: linear-gradient(
                 to bottom,
                 rgba(0,0,0,0.05) 0%,
-                rgba(0,0,0,0.20) 40%,
-                rgba(10,10,10,0.92) 85%,
+                rgba(0,0,0,0.20) 35%,
+                rgba(10,10,10,0.88) 70%,
                 rgba(10,10,10,1) 100%
             );
             z-index: 1;
@@ -124,59 +157,46 @@
             position: relative;
             z-index: 2;
             text-align: center;
-            padding: 0 24px 36px;
+            padding: 0 20px 28px;
             width: 100%;
         }
 
         /* ─── LOGO ─── */
-        .logo-wrap {
-            margin-bottom: 10px;
-        }
+        .logo-wrap { margin-bottom: 10px; }
 
         .logo-wrap img {
-            width: 72px;
-            height: 72px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             border: 2px solid var(--gold);
             object-fit: cover;
-            box-shadow: 0 0 20px var(--gold-glow);
+            box-shadow: 0 0 24px var(--gold-glow);
             background: #111;
         }
 
         .brand-name {
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 3px;
             color: var(--gold);
             text-transform: uppercase;
-            margin-bottom: 14px;
+            margin-bottom: 6px;
         }
 
-        .brand-line {
-            display: flex;
+        .brand-badge {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .brand-line-bar {
-            flex: 1;
-            max-width: 60px;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--gold));
-        }
-
-        .brand-line-bar.right {
-            background: linear-gradient(to left, transparent, var(--gold));
-        }
-
-        .brand-line-text {
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            background: rgba(212,175,55,0.12);
+            border: 1px solid rgba(212,175,55,0.3);
             font-size: 10px;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             color: var(--gold);
-            font-weight: 500;
+            font-weight: 700;
             text-transform: uppercase;
+            margin-bottom: 14px;
         }
 
         /* ─── HERO TITLE ─── */
@@ -191,15 +211,14 @@
 
         .hero-title-gold {
             display: block;
-            font-size: 52px;
+            font-size: 56px;
             font-weight: 900;
             background: linear-gradient(180deg, #F5E27A 0%, #D4AF37 45%, #B8860B 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            line-height: 1.1;
-            margin-bottom: 12px;
-            text-shadow: none;
+            line-height: 1.05;
+            margin-bottom: 10px;
             filter: drop-shadow(0 4px 16px rgba(212,175,55,0.5));
         }
 
@@ -208,115 +227,71 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
 
-        .hero-divider-line {
-            width: 40px;
-            height: 1px;
-            background: var(--gold);
-            opacity: 0.6;
-        }
-
-        .hero-divider-diamond {
-            width: 8px;
-            height: 8px;
-            background: var(--gold);
-            transform: rotate(45deg);
-        }
+        .hero-divider-line { width: 40px; height: 1px; background: var(--gold); opacity: 0.6; }
+        .hero-divider-diamond { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); }
 
         .hero-desc {
             font-size: 14px;
-            font-weight: 400;
             color: rgba(255,255,255,0.75);
             line-height: 1.7;
+            margin-bottom: 18px;
         }
 
-        /* ─── FEATURES ─── */
-        .features-section {
-            background: #fff;
-            margin: 0 16px;
-            border-radius: 20px;
-            padding: 20px 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 3;
-            margin-top: -2px;
-        }
-
-        .feature-item {
+        /* ─── STATS ROW ─── */
+        .stats-row {
             display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.07);
-        }
-
-        .feature-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .feature-item:first-child {
-            padding-top: 0;
-        }
-
-        .feature-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
         }
 
-        .feature-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--gold);
+        .stat-item {
+            flex: 1;
+            max-width: 110px;
+            text-align: center;
+            padding: 0 12px;
+            border-right: 1px solid rgba(212,175,55,0.2);
         }
 
-        .feature-text h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 2px;
+        .stat-item:last-child { border-right: none; }
+
+        .stat-num {
+            font-size: 22px;
+            font-weight: 900;
+            background: linear-gradient(180deg, #F5E27A 0%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
         }
 
-        .feature-text p {
-            font-size: 12px;
-            font-weight: 400;
-            color: #666;
-            line-height: 1.5;
-        }
+        .stat-label { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 2px; }
 
-        /* ─── CTA SECTION ─── */
-        .cta-section {
-            padding: 24px 16px 8px;
-        }
-
+        /* ─── CTA BUTTON ─── */
         .btn-line {
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
+            max-width: 380px;
+            margin: 0 auto;
             padding: 18px 24px;
             border-radius: 999px;
             background: linear-gradient(135deg, #F5E27A 0%, #D4AF37 40%, #B8860B 100%);
             color: #1a1000;
             text-decoration: none;
             font-size: 20px;
-            font-weight: 800;
+            font-weight: 900;
             font-family: 'Kanit', sans-serif;
             box-shadow: 0 8px 28px rgba(212,175,55,0.55), 0 2px 8px rgba(0,0,0,0.3);
-            text-shadow: 0 1px 2px rgba(255,255,255,0.2);
             animation: ctaPulse 2s ease-in-out infinite;
             gap: 12px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            border: none;
         }
 
         .btn-line::before {
@@ -325,14 +300,11 @@
             top: 0; left: -100%;
             width: 60%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             animation: shimmer 2.5s ease-in-out infinite;
         }
 
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 200%; }
-        }
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
 
         @keyframes ctaPulse {
             0%, 100% { box-shadow: 0 8px 28px rgba(212,175,55,0.55), 0 2px 8px rgba(0,0,0,0.3); transform: scale(1); }
@@ -340,76 +312,97 @@
         }
 
         .line-circle {
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             background: #fff;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
 
-        .line-circle svg {
-            width: 22px;
-            height: 22px;
-            fill: #06C755;
+        .line-circle svg { width: 22px; height: 22px; fill: #06C755; }
+
+        .btn-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            text-align: center;
+            margin-top: 8px;
         }
 
-        /* ─── LIVE FEED ─── */
-        .live-section {
-            padding: 20px 16px 8px;
+        /* ─── FEATURES ─── */
+        .features-section {
+            background: #fff;
+            margin: 20px 16px 0;
+            border-radius: 20px;
+            padding: 20px 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+        }
+
+        .feature-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .feature-item:first-child { padding-top: 0; }
+
+        .feature-icon {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .feature-icon svg { width: 22px; height: 22px; fill: var(--gold); }
+
+        .feature-text h3 { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; }
+        .feature-text p { font-size: 12px; color: #666; line-height: 1.5; }
+
+        /* ─── MID CTA ─── */
+        .cta-mid { padding: 20px 16px 0; }
+
+        /* ─── LIVE FEED ─── */
+        .live-section { padding: 20px 16px 0; }
 
         .live-header {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .live-dot {
-            width: 10px;
-            height: 10px;
+            width: 10px; height: 10px;
             border-radius: 50%;
             background: #ff3b3b;
             animation: blink 1.2s ease-in-out infinite;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
-        }
-
-        .live-badge {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: #ff3b3b;
-            text-transform: uppercase;
-        }
-
-        .live-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.7);
-            margin-left: auto;
-        }
+        .live-badge { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #ff3b3b; text-transform: uppercase; }
+        .live-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.65); margin-left: auto; }
 
         .live-box {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.04);
             border: 1px solid rgba(212,175,55,0.15);
             border-radius: 14px;
             overflow: hidden;
-            height: 200px;
+            height: 168px;
             position: relative;
         }
 
-        .live-list {
-            position: absolute;
-            width: 100%;
-            transition: transform 0.5s ease;
-        }
+        .live-list { position: absolute; width: 100%; transition: transform 0.5s ease; }
 
         .live-row {
             display: flex;
@@ -417,188 +410,120 @@
             gap: 10px;
             padding: 10px 14px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
+            height: 56px;
         }
 
         .live-avatar {
-            width: 34px;
-            height: 34px;
+            width: 34px; height: 34px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; color: #000;
             flex-shrink: 0;
         }
 
-        .live-info {
-            flex: 1;
-        }
+        .live-info { flex: 1; }
+        .live-name { font-size: 13px; font-weight: 600; color: #fff; }
+        .live-phone { font-size: 11px; color: rgba(255,255,255,0.45); }
+        .live-amount { text-align: right; }
+        .live-amount-num { font-size: 14px; font-weight: 700; color: var(--gold); }
+        .live-time { font-size: 10px; color: rgba(255,255,255,0.35); }
 
-        .live-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #fff;
-        }
+        /* ─── TRUST ─── */
+        .trust-section { padding: 20px 16px 24px; }
 
-        .live-phone {
-            font-size: 11px;
-            color: rgba(255,255,255,0.45);
-        }
+        .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 
-        .live-amount {
-            text-align: right;
-        }
-
-        .live-amount-num {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--gold);
-        }
-
-        .live-time {
-            font-size: 10px;
-            color: rgba(255,255,255,0.35);
-        }
-
-        /* ─── TRUST FOOTER ─── */
-        .trust-section {
-            padding: 20px 16px 32px;
-        }
-
-        .trust-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        .trust-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            text-align: center;
-        }
+        .trust-item { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
 
         .trust-icon {
-            width: 36px;
-            height: 36px;
+            width: 40px; height: 40px;
             border-radius: 50%;
             background: rgba(212,175,55,0.1);
             border: 1px solid rgba(212,175,55,0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .trust-icon svg {
-            width: 18px;
-            height: 18px;
-            fill: var(--gold);
+        .trust-icon svg { width: 20px; height: 20px; fill: var(--gold); }
+        .trust-label { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.55); line-height: 1.4; }
+
+        /* ─── STICKY CTA ─── */
+        .sticky-cta {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            z-index: 200;
+            background: rgba(10,10,10,0.96);
+            border-top: 1px solid rgba(212,175,55,0.25);
+            padding: 10px 16px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
-        .trust-label {
-            font-size: 10px;
-            font-weight: 500;
-            color: rgba(255,255,255,0.55);
-            line-height: 1.4;
-        }
+        .sticky-cta .btn-line { padding: 15px 20px; font-size: 18px; }
 
-        /* ─── TOAST POPUP ─── */
+        /* ─── TOAST ─── */
         #toastContainer {
             position: fixed;
-            bottom: 80px;
-            left: 16px;
+            bottom: 90px; left: 16px;
             z-index: 9999;
             pointer-events: none;
         }
 
         .toast-review {
-            background: rgba(20,20,20,0.95);
+            background: rgba(20,15,0,0.96);
             border: 1px solid rgba(212,175,55,0.3);
             border-radius: 14px;
             padding: 12px 14px;
             display: flex;
             align-items: center;
             gap: 10px;
-            width: 260px;
+            width: 270px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             opacity: 0;
             transform: translateY(20px) scale(0.95);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .toast-review.show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-
-        .toast-review.hide {
-            opacity: 0;
-            transform: translateY(-16px) scale(0.95);
-            transition: all 0.3s ease-in;
-        }
+        .toast-review.show { opacity: 1; transform: translateY(0) scale(1); }
+        .toast-review.hide { opacity: 0; transform: translateY(-16px) scale(0.95); transition: all 0.3s ease-in; }
 
         .toast-avatar {
-            width: 38px;
-            height: 38px;
+            width: 38px; height: 38px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 700;
-            color: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700; color: #000;
             flex-shrink: 0;
         }
 
         .toast-body { flex: 1; }
-
-        .toast-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 2px;
-        }
-
-        .toast-stars {
-            color: var(--gold);
-            font-size: 11px;
-            margin-bottom: 2px;
-        }
-
-        .toast-msg {
-            font-size: 11px;
-            color: rgba(255,255,255,0.65);
-            line-height: 1.4;
-        }
-
-        .toast-time {
-            font-size: 10px;
-            color: rgba(255,255,255,0.35);
-            white-space: nowrap;
-            align-self: flex-start;
-        }
+        .toast-name { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .toast-stars { color: var(--gold); font-size: 11px; margin-bottom: 2px; }
+        .toast-msg { font-size: 11px; color: rgba(255,255,255,0.65); line-height: 1.4; }
+        .toast-time { font-size: 10px; color: rgba(255,255,255,0.35); white-space: nowrap; align-self: flex-start; }
     </style>
 </head>
 <body>
 
-    <!-- HERO SECTION -->
+    <!-- URGENCY BANNER -->
+    <div class="urgency-bar">
+        <div class="urgency-dot"></div>
+        <span>เหลือที่ว่างอีกเพียง <strong id="slotsLeft">8</strong> ที่เท่านั้น — รับสิทธิ์ก่อนเต็ม!</span>
+    </div>
+
+    <!-- HERO -->
     <section class="hero">
         <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <div class="logo-wrap">
-                <img src="logo-yx888.png" alt="Yellowx888 Logo" />
+                <img src="logo-yx888.png" alt="Yellowx888 Logo" width="80" height="80" />
             </div>
             <div class="brand-name">Yellowx888</div>
-            <div class="brand-line">
-                <div class="brand-line-bar"></div>
-                <div class="brand-line-text">Investment</div>
-                <div class="brand-line-bar right"></div>
+            <div class="brand-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                Investment — จากดูไบ
             </div>
             <h1 class="hero-title">ระบบมาตรฐานสากล</h1>
             <span class="hero-title-gold">จากดูไบ</span>
@@ -608,24 +533,52 @@
                 <div class="hero-divider-line"></div>
             </div>
             <p class="hero-desc">เทคโนโลยีล้ำสมัย มาตรฐานระดับโลก<br>เพื่อการทำรายการที่มั่นคงและยั่งยืน</p>
+
+            <!-- STATS -->
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-num">50K+</div>
+                    <div class="stat-label">สมาชิก</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">฿2M+</div>
+                    <div class="stat-label">ถอนแล้ว</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num">4.9★</div>
+                    <div class="stat-label">รีวิว</div>
+                </div>
+            </div>
+
+            <!-- ABOVE-FOLD CTA -->
+            <a
+                href="order.html"
+                class="btn-line"
+                onclick="event.preventDefault(); tdTracking.goWithTrack('order.html');"
+            >
+                <div class="line-circle">
+                    <svg viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.047c-.052.312-.252 1.217 1.089.665 1.341-.553 7.235-4.261 9.871-7.298 1.914-2.128 2.079-4.01 2.079-5.7z"/></svg>
+                </div>
+                แอดไลน์รับสิทธิ์เลย
+            </a>
+            <div class="btn-sub">ฟรี! ไม่มีค่าใช้จ่าย • ตอบกลับภายใน 5 นาที</div>
         </div>
     </section>
 
-    <!-- FEATURES SECTION -->
+    <!-- FEATURES -->
     <div class="features-section">
+        <div class="section-title">ทำไมต้อง Yellowx888?</div>
         <div class="feature-item">
             <div class="feature-icon">
-                <!-- Lightning bolt -->
                 <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
             </div>
             <div class="feature-text">
-                <h3>ทำรายการไว</h3>
+                <h3>ทำรายการไวที่สุด</h3>
                 <p>ระบบประมวลผลรวดเร็ว ทันทุกโอกาสการลงทุน</p>
             </div>
         </div>
         <div class="feature-item">
             <div class="feature-icon">
-                <!-- Shield check -->
                 <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
             </div>
             <div class="feature-text">
@@ -635,7 +588,6 @@
         </div>
         <div class="feature-item">
             <div class="feature-icon">
-                <!-- Crown -->
                 <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
             </div>
             <div class="feature-text">
@@ -645,8 +597,8 @@
         </div>
     </div>
 
-    <!-- CTA SECTION -->
-    <div class="cta-section">
+    <!-- MID CTA -->
+    <div class="cta-mid">
         <a
             href="order.html"
             class="btn-line"
@@ -655,11 +607,11 @@
             <div class="line-circle">
                 <svg viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.047c-.052.312-.252 1.217 1.089.665 1.341-.553 7.235-4.261 9.871-7.298 1.914-2.128 2.079-4.01 2.079-5.7z"/></svg>
             </div>
-            แอดไลน์เพื่อเริ่มต้น
+            รับสิทธิ์ฟรีตอนนี้เลย
         </a>
     </div>
 
-    <!-- LIVE FEED SECTION -->
+    <!-- LIVE FEED -->
     <div class="live-section">
         <div class="live-header">
             <div class="live-dot"></div>
@@ -671,7 +623,7 @@
         </div>
     </div>
 
-    <!-- TRUST SECTION -->
+    <!-- TRUST -->
     <div class="trust-section">
         <div class="trust-grid">
             <div class="trust-item">
@@ -690,7 +642,7 @@
                 <div class="trust-icon">
                     <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                 </div>
-                <div class="trust-label">ดูแลโดย<br>ทีมงานมืออาชีพ</div>
+                <div class="trust-label">ดูแลโดย<br>ทีมมืออาชีพ</div>
             </div>
             <div class="trust-item">
                 <div class="trust-icon">
@@ -701,34 +653,52 @@
         </div>
     </div>
 
-    <!-- TOAST POPUP -->
+    <!-- TOAST -->
     <div id="toastContainer"></div>
 
+    <!-- STICKY CTA -->
+    <div class="sticky-cta">
+        <a
+            href="order.html"
+            class="btn-line"
+            onclick="event.preventDefault(); tdTracking.goWithTrack('order.html');"
+        >
+            <div class="line-circle">
+                <svg viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.047c-.052.312-.252 1.217 1.089.665 1.341-.553 7.235-4.261 9.871-7.298 1.914-2.128 2.079-4.01 2.079-5.7z"/></svg>
+            </div>
+            แอดไลน์รับสิทธิ์เลย
+        </a>
+    </div>
+
     <script>
+    // ─── URGENCY SLOTS ───
+    (function () {
+        let slots = 7 + Math.floor(Math.random() * 4);
+        const el = document.getElementById("slotsLeft");
+        el.textContent = String(slots);
+        setInterval(() => {
+            if (slots > 2 && Math.random() < 0.3) {
+                slots--;
+                el.textContent = String(slots);
+            }
+        }, 18000);
+    })();
+
     // ─── LIVE FEED ───
     (function () {
         const names = ["สมชาย ว.","อนันต์ ก.","ปิยะ ส.","วิชัย น.","ธนา ร.","ณัฐ ม.","กิตติ ป.","ชาญ อ.","วรา ท.","สุรชัย จ.","พิชัย ล.","ธีร์ ข.","ภาณุ ศ.","ปรีชา ห.","สมศักดิ์ ด.","อภิชาต ย.","ไพโรจน์ ฉ.","ณัฐพล ว.","สุทธิ บ.","ชัยวัฒน์ ค."];
-        const phones = ["08x-xxx-","09x-xxx-","06x-xxx-","08x-xxx-","09x-xxx-"];
+        const phones = ["08x-xxx-","09x-xxx-","06x-xxx-"];
         const amounts = [500,800,1000,1200,1500,2000,2500,3000,3500,4000,5000,6000,7500,8000,10000,12000,15000,20000];
-        const times = ["เมื่อกี้","1 นาทีที่แล้ว","2 นาทีที่แล้ว","3 นาทีที่แล้ว","5 นาทีที่แล้ว","7 นาทีที่แล้ว","10 นาทีที่แล้ว","12 นาทีที่แล้ว","15 นาทีที่แล้ว","20 นาทีที่แล้ว"];
+        const times = ["เมื่อกี้","1 นาทีที่แล้ว","2 นาทีที่แล้ว","3 นาทีที่แล้ว","5 นาทีที่แล้ว","7 นาทีที่แล้ว","10 นาทีที่แล้ว","15 นาทีที่แล้ว"];
 
         function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-        function randPhone() {
-            const p = rand(phones);
-            const n = String(Math.floor(Math.random() * 9000) + 1000);
-            return p + n;
-        }
-        function randAmount() {
-            const a = rand(amounts);
-            return "฿" + a.toLocaleString();
-        }
-        function randInitial(name) { return name.charAt(0); }
+        function randPhone() { return rand(phones) + String(Math.floor(Math.random() * 9000) + 1000); }
+        function randAmount() { return "฿" + rand(amounts).toLocaleString(); }
 
         function generateRows(count) {
             const rows = [];
             for (let i = 0; i < count; i++) {
-                const name = rand(names);
-                rows.push({ name, phone: randPhone(), amount: randAmount(), time: rand(times) });
+                rows.push({ name: rand(names), phone: randPhone(), amount: randAmount(), time: rand(times) });
             }
             return rows;
         }
@@ -741,12 +711,11 @@
 
         function renderRows() {
             list.innerHTML = "";
-            const display = [...rows, ...rows.slice(0, VISIBLE)];
-            display.forEach(r => {
+            [...rows, ...rows.slice(0, VISIBLE)].forEach(r => {
                 const div = document.createElement("div");
                 div.className = "live-row";
                 div.innerHTML = `
-                    <div class="live-avatar">${randInitial(r.name)}</div>
+                    <div class="live-avatar">${r.name.charAt(0)}</div>
                     <div class="live-info">
                         <div class="live-name">${r.name}</div>
                         <div class="live-phone">${r.phone}</div>
@@ -801,16 +770,13 @@
         function showToast() {
             const r = reviews[idx % reviews.length];
             idx++;
-            const stars = "★".repeat(r.stars);
-            const initial = r.name.charAt(0);
-
             const el = document.createElement("div");
             el.className = "toast-review";
             el.innerHTML = `
-                <div class="toast-avatar">${initial}</div>
+                <div class="toast-avatar">${r.name.charAt(0)}</div>
                 <div class="toast-body">
                     <div class="toast-name">${r.name}</div>
-                    <div class="toast-stars">${stars}</div>
+                    <div class="toast-stars">${"★".repeat(r.stars)}</div>
                     <div class="toast-msg">${r.msg}</div>
                 </div>
                 <div class="toast-time">${rand(times)}</div>`;
@@ -829,7 +795,7 @@
         setTimeout(() => {
             showToast();
             setInterval(showToast, 5500);
-        }, 2000);
+        }, 1500);
     })();
     </script>
 
