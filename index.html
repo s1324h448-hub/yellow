@@ -3,203 +3,835 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Online Access Portal</title>
-    <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
-    <style>
-        * {
-            box-sizing: border-box;
+    <title>Yellowx888 จากดูไบ</title>
+    <link rel="shortcut icon" href="logo-yx888.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- TikTok Pixel -->
+    <script>
+    (function () {
+        const PIXEL_ID = "D7EB5URC77UDSGCE2100";
+        const STORAGE_EXTERNAL_ID = "td_external_id";
+        const STORAGE_TTCLID = "td_ttclid";
+
+        function getParam(name) {
+            return new URLSearchParams(window.location.search).get(name);
         }
+        function getOrCreateExternalId() {
+            let id = getParam("external_id") || localStorage.getItem(STORAGE_EXTERNAL_ID);
+            if (!id) id = "td_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 12);
+            localStorage.setItem(STORAGE_EXTERNAL_ID, id);
+            return id;
+        }
+        function captureTtclid() {
+            const ttclid = getParam("ttclid");
+            if (ttclid) { localStorage.setItem(STORAGE_TTCLID, ttclid); return ttclid; }
+            return localStorage.getItem(STORAGE_TTCLID) || "";
+        }
+
+        const externalId = getOrCreateExternalId();
+        const ttclid = captureTtclid();
+
+        window.tdTracking = {
+            externalId, ttclid,
+            track: function (eventName) {
+                if (typeof ttq !== "undefined") {
+                    ttq.track(eventName, { external_id: externalId, ttclid: ttclid || undefined });
+                }
+            },
+            goWithTrack: function (url) {
+                this.track("CompleteRegistration");
+                const target = new URL(url, window.location.href);
+                if (ttclid) target.searchParams.set("ttclid", ttclid);
+                if (externalId) target.searchParams.set("external_id", externalId);
+                setTimeout(() => { window.location.href = target.toString(); }, 400);
+            }
+        };
+
+        !function (w, d, t) {
+            w.TiktokAnalyticsObject = t;
+            var ttq = w[t] = w[t] || [];
+            ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
+            ttq.setAndDefer = function (t, e) { t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))); }; };
+            for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+            ttq.load = function (e) {
+                var s = d.createElement("script"); s.async = true;
+                s.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + e + "&lib=" + t;
+                d.getElementsByTagName("script")[0].parentNode.insertBefore(s, d.getElementsByTagName("script")[0]);
+            };
+            ttq.load(PIXEL_ID);
+            ttq.identify({ external_id: externalId });
+            ttq.page();
+        }(window, document, "ttq");
+    })();
+    </script>
+
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-dark: #B8860B;
+            --gold-light: #F5E27A;
+            --gold-glow: rgba(212,175,55,0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         html, body {
-            margin: 0;
-            padding: 0;
             width: 100%;
-            height: 100%;
-            font-family: Arial, sans-serif;
-            color: #ffffff;
+            min-height: 100%;
+            font-family: 'Kanit', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            position: relative;
+            width: 100%;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 0;
             overflow: hidden;
-            background: #000;
         }
 
-        #bg-video {
-            position: fixed;
+        .hero-bg {
+            position: absolute;
             inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            background: url('bg-hero-new.jpg') center top / cover no-repeat;
+            z-index: 0;
         }
 
-        .overlay {
-            position: fixed;
+        .hero-overlay {
+            position: absolute;
             inset: 0;
-            background:
-                linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.60) 100%);
-            backdrop-filter: blur(2px);
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.05) 0%,
+                rgba(0,0,0,0.20) 40%,
+                rgba(10,10,10,0.92) 85%,
+                rgba(10,10,10,1) 100%
+            );
+            z-index: 1;
         }
 
-        .page {
+        .hero-content {
             position: relative;
             z-index: 2;
-            min-height: 100vh;
+            text-align: center;
+            padding: 0 24px 36px;
+            width: 100%;
+        }
+
+        /* ─── LOGO ─── */
+        .logo-wrap {
+            margin-bottom: 10px;
+        }
+
+        .logo-wrap img {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            object-fit: cover;
+            box-shadow: 0 0 20px var(--gold-glow);
+            background: #111;
+        }
+
+        .brand-name {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .brand-line {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            gap: 8px;
+            margin-bottom: 16px;
         }
 
-        .card {
-            width: 100%;
-            max-width: 540px;
-            padding: 32px 28px;
-            border-radius: 24px;
-            background: rgba(20, 20, 20, 0.50);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.40);
-            text-align: center;
+        .brand-line-bar {
+            flex: 1;
+            max-width: 60px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--gold));
         }
 
-        .badge {
-            display: inline-block;
-            padding: 8px 14px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: bold;
-            letter-spacing: 0.3px;
-            background: rgba(255, 255, 255, 0.12);
-            margin-bottom: 18px;
+        .brand-line-bar.right {
+            background: linear-gradient(to left, transparent, var(--gold));
         }
 
-        h1 {
-            margin: 0 0 12px;
-            font-size: 34px;
+        .brand-line-text {
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: var(--gold);
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        /* ─── HERO TITLE ─── */
+        .hero-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
             line-height: 1.2;
-            font-weight: 700;
+            margin-bottom: 4px;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.6);
         }
 
-        p {
-            margin: 0 auto 26px;
-            max-width: 420px;
-            font-size: 16px;
-            line-height: 1.65;
-            color: rgba(255, 255, 255, 0.88);
+        .hero-title-gold {
+            display: block;
+            font-size: 52px;
+            font-weight: 900;
+            background: linear-gradient(180deg, #F5E27A 0%, #D4AF37 45%, #B8860B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            text-shadow: none;
+            filter: drop-shadow(0 4px 16px rgba(212,175,55,0.5));
         }
 
-        .btn {
-            display: inline-flex;
+        .hero-divider {
+            display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 220px;
-            padding: 16px 28px;
-            border: none;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #19c37d 0%, #0ea765 100%);
-            color: #fff;
-            font-size: 17px;
-            font-weight: bold;
-            text-decoration: none;
-            box-shadow: 0 12px 30px rgba(25, 195, 125, 0.32);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            gap: 10px;
+            margin-bottom: 14px;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 16px 34px rgba(25, 195, 125, 0.36);
+        .hero-divider-line {
+            width: 40px;
+            height: 1px;
+            background: var(--gold);
+            opacity: 0.6;
         }
 
-        .btn:active {
-            transform: translateY(0);
-            opacity: 0.95;
+        .hero-divider-diamond {
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            transform: rotate(45deg);
         }
 
-        .meta {
-            margin-top: 18px;
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.70);
+        .hero-desc {
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.7;
         }
 
-        .footer {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 14px;
-            z-index: 2;
-            text-align: center;
+        /* ─── FEATURES ─── */
+        .features-section {
+            background: #fff;
+            margin: 0 16px;
+            border-radius: 20px;
+            padding: 20px 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 3;
+            margin-top: -2px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.07);
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .feature-item:first-child {
+            padding-top: 0;
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .feature-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--gold);
+        }
+
+        .feature-text h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .feature-text p {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.65);
-            padding: 0 16px;
+            font-weight: 400;
+            color: #666;
+            line-height: 1.5;
         }
 
-        @media (max-width: 640px) {
-            .card {
-                padding: 28px 20px;
-                border-radius: 20px;
-            }
+        /* ─── CTA SECTION ─── */
+        .cta-section {
+            padding: 24px 16px 8px;
+        }
 
-            h1 {
-                font-size: 28px;
-            }
+        .btn-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 18px 24px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #F5E27A 0%, #D4AF37 40%, #B8860B 100%);
+            color: #1a1000;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: 800;
+            font-family: 'Kanit', sans-serif;
+            box-shadow: 0 8px 28px rgba(212,175,55,0.55), 0 2px 8px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 2px rgba(255,255,255,0.2);
+            animation: ctaPulse 2s ease-in-out infinite;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
 
-            p {
-                font-size: 15px;
-            }
+        .btn-line::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: shimmer 2.5s ease-in-out infinite;
+        }
 
-            .btn {
-                width: 100%;
-                min-width: 0;
-            }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        @keyframes ctaPulse {
+            0%, 100% { box-shadow: 0 8px 28px rgba(212,175,55,0.55), 0 2px 8px rgba(0,0,0,0.3); transform: scale(1); }
+            50% { box-shadow: 0 12px 40px rgba(212,175,55,0.75), 0 4px 12px rgba(0,0,0,0.3); transform: scale(1.02); }
+        }
+
+        .line-circle {
+            width: 36px;
+            height: 36px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .line-circle svg {
+            width: 22px;
+            height: 22px;
+            fill: #06C755;
+        }
+
+        /* ─── LIVE FEED ─── */
+        .live-section {
+            padding: 20px 16px 8px;
+        }
+
+        .live-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff3b3b;
+            animation: blink 1.2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .live-badge {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #ff3b3b;
+            text-transform: uppercase;
+        }
+
+        .live-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            margin-left: auto;
+        }
+
+        .live-box {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(212,175,55,0.15);
+            border-radius: 14px;
+            overflow: hidden;
+            height: 200px;
+            position: relative;
+        }
+
+        .live-list {
+            position: absolute;
+            width: 100%;
+            transition: transform 0.5s ease;
+        }
+
+        .live-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .live-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .live-info {
+            flex: 1;
+        }
+
+        .live-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .live-phone {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+        }
+
+        .live-amount {
+            text-align: right;
+        }
+
+        .live-amount-num {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .live-time {
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+        }
+
+        /* ─── TRUST FOOTER ─── */
+        .trust-section {
+            padding: 20px 16px 32px;
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .trust-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-align: center;
+        }
+
+        .trust-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(212,175,55,0.1);
+            border: 1px solid rgba(212,175,55,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .trust-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--gold);
+        }
+
+        .trust-label {
+            font-size: 10px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.4;
+        }
+
+        /* ─── TOAST POPUP ─── */
+        #toastContainer {
+            position: fixed;
+            bottom: 80px;
+            left: 16px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .toast-review {
+            background: rgba(20,20,20,0.95);
+            border: 1px solid rgba(212,175,55,0.3);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 260px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .toast-review.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .toast-review.hide {
+            opacity: 0;
+            transform: translateY(-16px) scale(0.95);
+            transition: all 0.3s ease-in;
+        }
+
+        .toast-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .toast-body { flex: 1; }
+
+        .toast-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .toast-stars {
+            color: var(--gold);
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .toast-msg {
+            font-size: 11px;
+            color: rgba(255,255,255,0.65);
+            line-height: 1.4;
+        }
+
+        .toast-time {
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+            white-space: nowrap;
+            align-self: flex-start;
         }
     </style>
-
-    <script>
-    !function (w, d, t) {
-        w.TiktokAnalyticsObject = t;
-        var ttq = w[t] = w[t] || [];
-        ttq.methods = ["page", "track"];
-        ttq.setAndDefer = function (obj, method) {
-            obj[method] = function () {
-                obj.push([method].concat(Array.prototype.slice.call(arguments, 0)));
-            };
-        };
-        for (var i = 0; i < ttq.methods.length; i++) {
-            ttq.setAndDefer(ttq, ttq.methods[i]);
-        }
-        ttq.load = function (id) {
-            var s = document.createElement("script");
-            s.async = true;
-            s.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + id;
-            var x = document.getElementsByTagName("script")[0];
-            x.parentNode.insertBefore(s, x);
-        };
-        ttq.load("D7EB5URC77UDSGCE2100");
-        ttq.page();
-    }(window, document, "ttq");
-    </script>
 </head>
 <body>
-    <video id="bg-video" autoplay muted loop playsinline>
-        <source src="bg.mp4" type="video/mp4" />
-    </video>
 
-    <div class="overlay"></div>
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="logo-wrap">
+                <img src="logo-yx888.png" alt="Yellowx888 Logo" />
+            </div>
+            <div class="brand-name">Yellowx888</div>
+            <div class="brand-line">
+                <div class="brand-line-bar"></div>
+                <div class="brand-line-text">Investment</div>
+                <div class="brand-line-bar right"></div>
+            </div>
+            <h1 class="hero-title">ระบบมาตรฐานสากล</h1>
+            <span class="hero-title-gold">จากดูไบ</span>
+            <div class="hero-divider">
+                <div class="hero-divider-line"></div>
+                <div class="hero-divider-diamond"></div>
+                <div class="hero-divider-line"></div>
+            </div>
+            <p class="hero-desc">เทคโนโลยีล้ำสมัย มาตรฐานระดับโลก<br>เพื่อการทำรายการที่มั่นคงและยั่งยืน</p>
+        </div>
+    </section>
 
-    <main class="page">
-        <section class="card">
-            <div class="badge">ONLINE ACCESS</div>
-            <h1>เริ่มต้นใช้งานได้ในไม่กี่ขั้นตอน</h1>
-            <p>
-                ระบบกำลังเปิดให้เข้าใช้งานตามลำดับ กรุณาตรวจสอบรายละเอียดและดำเนินการต่อผ่านหน้าถัดไป
-            </p>
-
-            <a class="btn" href="order.html" onclick="ttq.track('ClickButton')">
-                ดำเนินการต่อ
-            </a>
-
-            <div class="meta">รองรับการใช้งานผ่านมือถือและเบราว์เซอร์ทั่วไป</div>
-        </section>
-    </main>
-
-    <div class="footer">
-        © 2026 Online Portal. All rights reserved.
+    <!-- FEATURES SECTION -->
+    <div class="features-section">
+        <div class="feature-item">
+            <div class="feature-icon">
+                <!-- Lightning bolt -->
+                <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="feature-text">
+                <h3>ทำรายการไว</h3>
+                <p>ระบบประมวลผลรวดเร็ว ทันทุกโอกาสการลงทุน</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">
+                <!-- Shield check -->
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+            </div>
+            <div class="feature-text">
+                <h3>ระบบเสถียร 100%</h3>
+                <p>เสถียร ปลอดภัย ทำงานต่อเนื่อง ไม่มีสะดุด</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">
+                <!-- Crown -->
+                <svg viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>
+            </div>
+            <div class="feature-text">
+                <h3>ดูแลระดับพรีเมียม</h3>
+                <p>ทีมงานมืออาชีพ ให้คำแนะนำและดูแลอย่างใกล้ชิด</p>
+            </div>
+        </div>
     </div>
+
+    <!-- CTA SECTION -->
+    <div class="cta-section">
+        <a
+            href="order.html"
+            class="btn-line"
+            onclick="event.preventDefault(); tdTracking.goWithTrack('order.html');"
+        >
+            <div class="line-circle">
+                <svg viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.047c-.052.312-.252 1.217 1.089.665 1.341-.553 7.235-4.261 9.871-7.298 1.914-2.128 2.079-4.01 2.079-5.7z"/></svg>
+            </div>
+            แอดไลน์เพื่อเริ่มต้น
+        </a>
+    </div>
+
+    <!-- LIVE FEED SECTION -->
+    <div class="live-section">
+        <div class="live-header">
+            <div class="live-dot"></div>
+            <div class="live-badge">LIVE</div>
+            <div class="live-title">รายการถอนล่าสุด</div>
+        </div>
+        <div class="live-box">
+            <div class="live-list" id="liveList"></div>
+        </div>
+    </div>
+
+    <!-- TRUST SECTION -->
+    <div class="trust-section">
+        <div class="trust-grid">
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                </div>
+                <div class="trust-label">ปลอดภัย<br>มาตรฐานสากล</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                <div class="trust-label">เทคโนโลยี<br>ระดับโลก</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+                <div class="trust-label">ดูแลโดย<br>ทีมงานมืออาชีพ</div>
+            </div>
+            <div class="trust-item">
+                <div class="trust-icon">
+                    <svg viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+                </div>
+                <div class="trust-label">มั่นคง โปร่งใส<br>ตรวจสอบได้</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST POPUP -->
+    <div id="toastContainer"></div>
+
+    <script>
+    // ─── LIVE FEED ───
+    (function () {
+        const names = ["สมชาย ว.","อนันต์ ก.","ปิยะ ส.","วิชัย น.","ธนา ร.","ณัฐ ม.","กิตติ ป.","ชาญ อ.","วรา ท.","สุรชัย จ.","พิชัย ล.","ธีร์ ข.","ภาณุ ศ.","ปรีชา ห.","สมศักดิ์ ด.","อภิชาต ย.","ไพโรจน์ ฉ.","ณัฐพล ว.","สุทธิ บ.","ชัยวัฒน์ ค."];
+        const phones = ["08x-xxx-","09x-xxx-","06x-xxx-","08x-xxx-","09x-xxx-"];
+        const amounts = [500,800,1000,1200,1500,2000,2500,3000,3500,4000,5000,6000,7500,8000,10000,12000,15000,20000];
+        const times = ["เมื่อกี้","1 นาทีที่แล้ว","2 นาทีที่แล้ว","3 นาทีที่แล้ว","5 นาทีที่แล้ว","7 นาทีที่แล้ว","10 นาทีที่แล้ว","12 นาทีที่แล้ว","15 นาทีที่แล้ว","20 นาทีที่แล้ว"];
+
+        function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function randPhone() {
+            const p = rand(phones);
+            const n = String(Math.floor(Math.random() * 9000) + 1000);
+            return p + n;
+        }
+        function randAmount() {
+            const a = rand(amounts);
+            return "฿" + a.toLocaleString();
+        }
+        function randInitial(name) { return name.charAt(0); }
+
+        function generateRows(count) {
+            const rows = [];
+            for (let i = 0; i < count; i++) {
+                const name = rand(names);
+                rows.push({ name, phone: randPhone(), amount: randAmount(), time: rand(times) });
+            }
+            return rows;
+        }
+
+        const list = document.getElementById("liveList");
+        const ROW_H = 56;
+        const VISIBLE = 3;
+        let rows = generateRows(20);
+        let offset = 0;
+
+        function renderRows() {
+            list.innerHTML = "";
+            const display = [...rows, ...rows.slice(0, VISIBLE)];
+            display.forEach(r => {
+                const div = document.createElement("div");
+                div.className = "live-row";
+                div.innerHTML = `
+                    <div class="live-avatar">${randInitial(r.name)}</div>
+                    <div class="live-info">
+                        <div class="live-name">${r.name}</div>
+                        <div class="live-phone">${r.phone}</div>
+                    </div>
+                    <div class="live-amount">
+                        <div class="live-amount-num">${r.amount}</div>
+                        <div class="live-time">${r.time}</div>
+                    </div>`;
+                list.appendChild(div);
+            });
+        }
+
+        renderRows();
+
+        setInterval(() => {
+            offset++;
+            if (offset >= rows.length) {
+                offset = 0;
+                list.style.transition = "none";
+                list.style.transform = "translateY(0)";
+                setTimeout(() => {
+                    list.style.transition = "transform 0.5s ease";
+                    list.style.transform = `translateY(-${ROW_H}px)`;
+                    offset = 1;
+                }, 50);
+            } else {
+                list.style.transition = "transform 0.5s ease";
+                list.style.transform = `translateY(-${offset * ROW_H}px)`;
+            }
+        }, 2800);
+    })();
+
+    // ─── TOAST REVIEW ───
+    (function () {
+        const reviews = [
+            { name: "สมชาย ก.", stars: 5, msg: "ระบบดีมาก ทำรายการไวมาก ประทับใจครับ" },
+            { name: "วิภา ส.", stars: 5, msg: "ทีมงานดูแลดีมาก ตอบไวทุกคำถาม" },
+            { name: "อนันต์ ร.", stars: 5, msg: "ใช้งานง่าย ระบบเสถียรดีมากเลยครับ" },
+            { name: "ปิยะ น.", stars: 5, msg: "ไม่มีสะดุดเลย ดีกว่าที่เก่ามากครับ" },
+            { name: "ธนา ม.", stars: 5, msg: "มาตรฐานดูไบจริงๆ ประทับใจมากครับ" },
+            { name: "ณัฐ ล.", stars: 5, msg: "บริการดีเยี่ยม แนะนำให้เพื่อนมาใช้แล้ว" },
+            { name: "กิตติ ว.", stars: 5, msg: "ระบบนอกจริง ไม่มีปัญหาเลยครับ" },
+            { name: "วรา ป.", stars: 5, msg: "ดีที่สุดเท่าที่เคยใช้มาเลยครับ" },
+        ];
+        const times = ["เมื่อกี้","1 นาทีที่แล้ว","2 นาทีที่แล้ว","3 นาทีที่แล้ว","5 นาทีที่แล้ว"];
+
+        function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+        const container = document.getElementById("toastContainer");
+        let idx = 0;
+
+        function showToast() {
+            const r = reviews[idx % reviews.length];
+            idx++;
+            const stars = "★".repeat(r.stars);
+            const initial = r.name.charAt(0);
+
+            const el = document.createElement("div");
+            el.className = "toast-review";
+            el.innerHTML = `
+                <div class="toast-avatar">${initial}</div>
+                <div class="toast-body">
+                    <div class="toast-name">${r.name}</div>
+                    <div class="toast-stars">${stars}</div>
+                    <div class="toast-msg">${r.msg}</div>
+                </div>
+                <div class="toast-time">${rand(times)}</div>`;
+            container.appendChild(el);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => { el.classList.add("show"); });
+            });
+
+            setTimeout(() => {
+                el.classList.add("hide");
+                setTimeout(() => { el.remove(); }, 400);
+            }, 4000);
+        }
+
+        setTimeout(() => {
+            showToast();
+            setInterval(showToast, 5500);
+        }, 2000);
+    })();
+    </script>
+
 </body>
 </html>

@@ -3,24 +3,74 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>กำลังเปิดหน้าต่อไป</title>
-    <style>
-        * {
-            box-sizing: border-box;
+    <title>กำลังเปิดหน้าต่อไป - Yellowx888</title>
+    <link rel="shortcut icon" href="logo-yx888.png" type="image/png" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- TikTok Pixel -->
+    <script>
+    (function () {
+        const PIXEL_ID = "D7EB5URC77UDSGCE2100";
+        const STORAGE_EXTERNAL_ID = "td_external_id";
+        const STORAGE_TTCLID = "td_ttclid";
+
+        function getParam(name) { return new URLSearchParams(window.location.search).get(name); }
+
+        function getOrCreateExternalId() {
+            let id = getParam("external_id") || localStorage.getItem(STORAGE_EXTERNAL_ID);
+            if (!id) id = "td_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 12);
+            localStorage.setItem(STORAGE_EXTERNAL_ID, id);
+            return id;
         }
+
+        function captureTtclid() {
+            const ttclid = getParam("ttclid");
+            if (ttclid) { localStorage.setItem(STORAGE_TTCLID, ttclid); return ttclid; }
+            return localStorage.getItem(STORAGE_TTCLID) || "";
+        }
+
+        const externalId = getOrCreateExternalId();
+        const ttclid = captureTtclid();
+
+        window.tdTracking = {
+            externalId, ttclid,
+            goToLine: function (url) {
+                if (typeof ttq !== "undefined") {
+                    ttq.track("CompleteRegistration", { external_id: externalId, ttclid: ttclid || undefined });
+                }
+                const target = new URL(url);
+                if (ttclid) target.searchParams.set("ttclid", ttclid);
+                if (externalId) target.searchParams.set("external_id", externalId);
+                setTimeout(() => { window.location.href = target.toString(); }, 500);
+            }
+        };
+
+        !function (w, d, t) {
+            w.TiktokAnalyticsObject = t;
+            var ttq = w[t] = w[t] || [];
+            ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
+            ttq.setAndDefer = function (t, e) { t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))); }; };
+            for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+            ttq.load = function (e) {
+                var s = d.createElement("script"); s.async = true;
+                s.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + e + "&lib=" + t;
+                d.getElementsByTagName("script")[0].parentNode.insertBefore(s, d.getElementsByTagName("script")[0]);
+            };
+            ttq.load(PIXEL_ID);
+            ttq.identify({ external_id: externalId });
+            ttq.page();
+        }(window, document, "ttq");
+    })();
+    </script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         html, body {
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
-            font-family: Arial, sans-serif;
-            background:
-                radial-gradient(circle at top, #1b1b1b 0%, #0d0d0d 45%, #050505 100%);
-            color: #ffffff;
-        }
-
-        body {
             min-height: 100vh;
+            font-family: 'Kanit', sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1a1400 0%, #0d0d0d 50%, #050505 100%);
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -29,157 +79,173 @@
 
         .card {
             width: 100%;
-            max-width: 460px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            border-radius: 24px;
-            padding: 30px 24px;
+            max-width: 420px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(212,175,55,0.20);
+            border-radius: 28px;
+            padding: 32px 24px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.40);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.50), 0 0 40px rgba(212,175,55,0.05);
         }
 
-        .status {
+        .logo-small {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 2px solid rgba(212,175,55,0.5);
+            margin: 0 auto 14px;
+            display: block;
+        }
+
+        .status-badge {
             display: inline-block;
-            padding: 7px 12px;
+            padding: 6px 14px;
             border-radius: 999px;
-            font-size: 12px;
-            font-weight: bold;
-            background: rgba(25, 195, 125, 0.14);
-            color: #7df0bc;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: rgba(212,175,55,0.12);
+            color: #D4AF37;
             margin-bottom: 16px;
+            text-transform: uppercase;
         }
 
         h1 {
-            margin: 0 0 10px;
-            font-size: 28px;
-            line-height: 1.3;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
         p {
-            margin: 0 0 18px;
-            font-size: 15px;
-            line-height: 1.65;
-            color: rgba(255, 255, 255, 0.82);
+            font-size: 14px;
+            color: rgba(255,255,255,0.65);
+            line-height: 1.6;
+            margin-bottom: 24px;
         }
 
-        .loader-wrap {
-            margin: 22px auto 16px;
+        .progress-wrap {
+            margin-bottom: 10px;
         }
 
-        .loader-wrap img {
-            width: 180px;
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto 16px;
-        }
-
-        .progress {
+        .progress-bar-bg {
             width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.08);
+            height: 8px;
+            background: rgba(255,255,255,0.08);
             border-radius: 999px;
             overflow: hidden;
         }
 
-        .progress-bar {
-            width: 0%;
+        .progress-bar-fill {
             height: 100%;
+            width: 0%;
             border-radius: 999px;
-            background: linear-gradient(90deg, #19c37d 0%, #67e8a5 100%);
-            animation: fillBar 3s linear forwards;
+            background: linear-gradient(90deg, #B8860B 0%, #D4AF37 50%, #F5E27A 100%);
+            animation: fillBar 4s linear forwards;
         }
 
-        @keyframes fillBar {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
+        @keyframes fillBar { from { width: 0%; } to { width: 100%; } }
 
         .countdown {
-            margin-top: 14px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.72);
+            font-size: 13px;
+            color: rgba(255,255,255,0.55);
+            margin: 10px 0 24px;
         }
 
-        .actions {
-            margin-top: 22px;
+        .countdown span {
+            color: #D4AF37;
+            font-weight: 700;
         }
 
-        .btn {
-            display: inline-flex;
+        .btn-line {
+            display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 15px 20px;
+            padding: 16px 20px;
             border-radius: 999px;
-            background: #ffffff;
-            color: #101010;
+            background: linear-gradient(135deg, #F5E27A 0%, #D4AF37 40%, #B8860B 100%);
+            color: #fff;
             text-decoration: none;
-            font-size: 16px;
-            font-weight: bold;
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Kanit', sans-serif;
+            box-shadow: 0 10px 30px rgba(212,175,55,0.45);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+            animation: ctaPulse 2s ease-in-out infinite;
         }
 
-        .btn:hover {
-            transform: translateY(-1px);
+        @keyframes ctaPulse {
+            0%, 100% { box-shadow: 0 10px 30px rgba(212,175,55,0.45); }
+            50% { box-shadow: 0 14px 40px rgba(212,175,55,0.65); }
         }
 
-        .btn:active {
-            transform: translateY(0);
-            opacity: 0.95;
+        .line-circle {
+            width: 32px; height: 32px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 10px; flex-shrink: 0;
         }
+
+        .line-circle svg { width: 20px; height: 20px; fill: #06C755; }
 
         .note {
-            margin-top: 14px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.56);
+            margin-top: 12px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.40);
         }
     </style>
 </head>
+
 <body>
     <div class="card">
-        <div class="status">PROCESSING</div>
+        <img src="logo-yx888.png" class="logo-small" alt="Logo" />
+        <div class="status-badge">Yellowx888</div>
         <h1>กำลังเปิดหน้าต่อไป</h1>
-        <p>กรุณารอสักครู่ ระบบกำลังพาคุณไปยังปลายทางโดยอัตโนมัติ</p>
+        <p>กรุณารอสักครู่ ระบบกำลังพาคุณไปยัง LINE โดยอัตโนมัติ</p>
 
-        <div class="loader-wrap">
-            <img src="loading.gif" alt="Loading" />
-            <div class="progress">
-                <div class="progress-bar"></div>
+        <div class="progress-wrap">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill"></div>
             </div>
         </div>
 
         <div class="countdown">
-            จะเปิดอัตโนมัติใน <span id="timer">3</span> วินาที
+            จะเปิดอัตโนมัติใน <span id="timer">4</span> วินาที
         </div>
 
-        <div class="actions">
-            <a class="btn" id="manualLink" href="https://lin.ee/wef80Gj">
-                เปิดทันที
-            </a>
-        </div>
+        <a
+            href="https://lin.ee/wef80Gj"
+            class="btn-line"
+            id="manualLink"
+            onclick="event.preventDefault(); tdTracking.goToLine('https://lin.ee/wef80Gj');"
+        >
+            <div class="line-circle">
+                <svg viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.047c-.052.312-.252 1.217 1.089.665 1.341-.553 7.235-4.261 9.871-7.298 1.914-2.128 2.079-4.01 2.079-5.7z"/></svg>
+            </div>
+            เปิดทันที
+        </a>
 
-        <div class="note">
-            หากระบบไม่เปิดอัตโนมัติ สามารถกดปุ่มด้านบนได้ทันที
-        </div>
+        <div class="note">หากระบบไม่เปิดอัตโนมัติ กดปุ่มด้านบนได้เลย</div>
     </div>
 
     <script>
         (function () {
-            const targetUrl = "https://lin.ee/wef80Gj?openExternalBrowser=1";
+            const targetUrl = "https://lin.ee/wef80Gj";
             const timerEl = document.getElementById("timer");
-            let seconds = 3;
+            let seconds = 4;
+
+            timerEl.textContent = String(seconds);
 
             const countdown = setInterval(() => {
                 seconds -= 1;
-
-                if (seconds >= 0) {
-                    timerEl.textContent = String(seconds);
-                }
+                timerEl.textContent = String(Math.max(seconds, 0));
 
                 if (seconds <= 0) {
                     clearInterval(countdown);
-                    window.location.href = targetUrl;
+                    setTimeout(() => {
+                        tdTracking.goToLine(targetUrl);
+                    }, 600);
                 }
             }, 1000);
         })();
