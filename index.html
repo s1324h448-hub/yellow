@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Yellow X — ระบบมาตรฐานสากลจากดูไบ</title>
-    <meta name="description" content="ระบบบริหารจัดการมาตรฐานสากลจากดูไบ เทคโนโลยีล้ำสมัย ดูแลโดยทีมมืออาชีพ 24 ชม. สมัครฟรี ไม่มีค่าใช้จ่าย" />
-    <meta property="og:title" content="Yellow X — ระบบมาตรฐานสากลจากดูไบ" />
+    <title>Yellow Official — ระบบมาตรฐานสากลจากดูไบ</title>
+    <meta name="description" content="ระบบบริหารจัดการมาตรฐานสากลจากดูไบ เทคโนโลยีล้ำสมัย ดูแลโดยทีมมืออาชีพ 24 ชม. ลงทะเบียนฟรี ไม่มีค่าใช้จ่าย" />
+    <meta property="og:title" content="Yellow Official — ระบบมาตรฐานสากลจากดูไบ" />
     <meta property="og:description" content="ระบบบริหารจัดการมาตรฐานสากลจากดูไบ เทคโนโลยีล้ำสมัย ดูแลโดยทีมมืออาชีพ 24 ชม." />
     <meta property="og:type" content="website" />
-    <link rel="shortcut icon" href="logo-yx888.png" type="image/png" />
+    <link rel="shortcut icon" href="logo-yellow.png" type="image/png" />
 
     <!-- Preload critical assets -->
     <link rel="preload" href="bg-hero-new.jpg" as="image" />
-    <link rel="preload" href="logo-yx888.png" as="image" />
+    <link rel="preload" href="logo-yellow.png" as="image" />
 
     <!-- Google Fonts — load only weights used -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,97 +21,103 @@
 
     <!-- TikTok Pixel -->
     <script>
-        (function() {
-            const PIXEL_ID = "D7EB5URC77UDSGCE2100";
-            const S_EID = "td_external_id";
-            const S_TTC = "td_ttclid";
+    (function () {
+        const PIXEL_ID = "D7EB5URC77UDSGCE2100";
+        const S_EID = "td_external_id";
+        const S_TTC = "td_ttclid";
 
-            function getParam(n) {
-                return new URLSearchParams(window.location.search).get(n);
-            }
+        function getParam(n) { return new URLSearchParams(window.location.search).get(n); }
 
-            function getOrCreateEid() {
-                let id = getParam("external_id") || localStorage.getItem(S_EID);
-                if (!id) id = "td_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 12);
-                localStorage.setItem(S_EID, id);
-                return id;
-            }
+        function getOrCreateEid() {
+            let id = getParam("external_id") || localStorage.getItem(S_EID);
+            if (!id) id = "td_" + Date.now().toString(36) + "_" + Math.random().toString(36).substring(2, 12);
+            localStorage.setItem(S_EID, id);
+            return id;
+        }
 
-            function captureTtclid() {
-                const t = getParam("ttclid");
-                if (t) {
-                    localStorage.setItem(S_TTC, t);
-                    return t;
+        function captureTtclid() {
+            const t = getParam("ttclid");
+            if (t) { localStorage.setItem(S_TTC, t); return t; }
+            return localStorage.getItem(S_TTC) || "";
+        }
+
+        const externalId = getOrCreateEid();
+        const ttclid = captureTtclid();
+
+        // ─── TikTok Events API (Server-side) ───
+        function sendTTCAPI(eventName) {
+            try {
+                const eventId = eventName + "_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+                if (typeof ttq !== "undefined") {
+                    var props = { external_id: externalId, ttclid: ttclid || undefined, event_id: eventId };
+                    if (eventName === "ViewContent") {
+                        props.contents = [{ content_id: "yellow-official-offer", content_type: "product", content_name: "Yellow Official" }];
+                    }
+                    ttq.track(eventName, props);
                 }
-                return localStorage.getItem(S_TTC) || "";
+                fetch("/api/tt-capi", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        event_name: eventName,
+                        event_time: Math.floor(Date.now() / 1000),
+                        event_id: eventId,
+                        event_source_url: window.location.href,
+                        user_data: {
+                            ttclid: ttclid || "",
+                            external_id: externalId,
+                            user_agent: navigator.userAgent
+                        }
+                    })
+                }).catch(function(e) { console.warn("TT CAPI error:", e); });
+            } catch(e) { console.warn("TT CAPI send error:", e); }
+        }
+
+        window.addEventListener("load", function() { sendTTCAPI("Pageview"); });
+
+        window.tdTracking = {
+            externalId, ttclid,
+            track: function (ttEv) {
+                sendTTCAPI(ttEv);
+            },
+            goWithTrack: function (url, ttEv) {
+                sendTTCAPI(ttEv || "ClickButton");
+                const target = new URL(url, window.location.href);
+                if (ttclid) target.searchParams.set("ttclid", ttclid);
+                if (externalId) target.searchParams.set("external_id", externalId);
+                setTimeout(() => { window.location.href = target.toString(); }, 300);
             }
+        };
 
-            const externalId = getOrCreateEid();
-            const ttclid = captureTtclid();
-
-            window.tdTracking = {
-                externalId,
-                ttclid,
-                track: function(ttEv, fbEv) {
-                    if (typeof ttq !== "undefined") ttq.track(ttEv, {
-                        external_id: externalId,
-                        ttclid: ttclid || undefined
-                    });
-                    if (typeof fbq !== "undefined" && fbEv) fbq("track", fbEv);
-                },
-                goWithTrack: function(url, ttEv, fbEv) {
-                    this.track(ttEv || "CompleteRegistration", fbEv || null);
-                    const target = new URL(url, window.location.href);
-                    if (ttclid) target.searchParams.set("ttclid", ttclid);
-                    if (externalId) target.searchParams.set("external_id", externalId);
-                    setTimeout(() => {
-                        window.location.href = target.toString();
-                    }, 300);
-                }
+        !function (w, d, t) {
+            w.TiktokAnalyticsObject = t;
+            var ttq = w[t] = w[t] || [];
+            ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
+            ttq.setAndDefer = function (t, e) { t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))); }; };
+            for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+            ttq.load = function (e) {
+                var s = d.createElement("script"); s.async = true;
+                s.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + e + "&lib=" + t;
+                d.getElementsByTagName("script")[0].parentNode.insertBefore(s, d.getElementsByTagName("script")[0]);
             };
-
-            ! function(w, d, t) {
-                w.TiktokAnalyticsObject = t;
-                var ttq = w[t] = w[t] || [];
-                ttq.methods = ["page", "track", "identify", "instances", "debug", "on", "off", "once", "ready", "alias", "group", "enableCookie", "disableCookie", "holdConsent", "revokeConsent", "grantConsent"];
-                ttq.setAndDefer = function(t, e) {
-                    t[e] = function() {
-                        t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
-                    };
-                };
-                for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
-                ttq.load = function(e) {
-                    var s = d.createElement("script");
-                    s.async = true;
-                    s.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + e + "&lib=" + t;
-                    d.getElementsByTagName("script")[0].parentNode.insertBefore(s, d.getElementsByTagName("script")[0]);
-                };
-                ttq.load(PIXEL_ID);
-                ttq.identify({
-                    external_id: externalId
-                });
-                ttq.page();
-            }(window, document, "ttq");
-        })();
+            ttq.load(PIXEL_ID);
+            ttq.identify({ external_id: externalId });
+            ttq.page();
+        }(window, document, "ttq");
+    })();
     </script>
 
     <style>
-         :root {
+        :root {
             --gold: #D4AF37;
             --gold-dark: #B8860B;
             --gold-light: #F5E27A;
-            --gold-glow: rgba(212, 175, 55, 0.5);
+            --gold-glow: rgba(212,175,55,0.5);
         }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        html,
-        body {
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
             width: 100%;
             min-height: 100%;
             font-family: 'Kanit', sans-serif;
@@ -121,14 +126,14 @@
             overflow-x: hidden;
             padding-bottom: 80px;
         }
+
         /* ─── URGENCY BANNER ─── */
-        
         .urgency-bar {
             position: sticky;
             top: 0;
             z-index: 100;
             background: linear-gradient(90deg, #1a0f00 0%, #2d1a00 50%, #1a0f00 100%);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            border-bottom: 1px solid rgba(212,175,55,0.3);
             padding: 9px 16px;
             display: flex;
             align-items: center;
@@ -139,27 +144,18 @@
             color: var(--gold-light);
             letter-spacing: 0.5px;
         }
-        
+
         .urgency-dot {
-            width: 8px;
-            height: 8px;
+            width: 8px; height: 8px;
             border-radius: 50%;
             background: #ff4444;
             animation: blink 1s ease-in-out infinite;
             flex-shrink: 0;
         }
-        
-        @keyframes blink {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.2;
-            }
-        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
         /* ─── HERO ─── */
-        
         .hero {
             position: relative;
             width: 100%;
@@ -170,7 +166,7 @@
             justify-content: flex-end;
             overflow: hidden;
         }
-        
+
         .hero-bg {
             position: absolute;
             inset: 0;
@@ -178,14 +174,20 @@
             z-index: 0;
             will-change: transform;
         }
-        
+
         .hero-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient( to bottom, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.20) 35%, rgba(10, 10, 10, 0.88) 70%, rgba(10, 10, 10, 1) 100%);
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.05) 0%,
+                rgba(0,0,0,0.20) 35%,
+                rgba(10,10,10,0.88) 70%,
+                rgba(10,10,10,1) 100%
+            );
             z-index: 1;
         }
-        
+
         .hero-content {
             position: relative;
             z-index: 2;
@@ -193,22 +195,20 @@
             padding: 0 20px 28px;
             width: 100%;
         }
+
         /* ─── LOGO ─── */
-        
-        .logo-wrap {
-            margin-bottom: 10px;
-        }
-        
+        .logo-wrap { margin-bottom: 10px; }
+
         .logo-wrap img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-            object-fit: cover;
-            box-shadow: 0 0 24px var(--gold-glow);
-            background: #111;
+            width: 110px;
+            height: 110px;
+            border-radius: 0;
+            border: none;
+            object-fit: contain;
+            filter: drop-shadow(0 0 16px rgba(212,175,55,0.5));
+            background: transparent;
         }
-        
+
         .brand-name {
             font-size: 13px;
             font-weight: 700;
@@ -217,15 +217,15 @@
             text-transform: uppercase;
             margin-bottom: 6px;
         }
-        
+
         .brand-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             padding: 5px 14px;
             border-radius: 999px;
-            background: rgba(212, 175, 55, 0.12);
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(212,175,55,0.12);
+            border: 1px solid rgba(212,175,55,0.3);
             font-size: 10px;
             letter-spacing: 3px;
             color: var(--gold);
@@ -233,17 +233,17 @@
             text-transform: uppercase;
             margin-bottom: 14px;
         }
+
         /* ─── HERO TITLE ─── */
-        
         .hero-title {
             font-size: 28px;
             font-weight: 800;
             color: #fff;
             line-height: 1.2;
             margin-bottom: 4px;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 2px 12px rgba(0,0,0,0.6);
         }
-        
+
         .hero-title-gold {
             display: block;
             font-size: 56px;
@@ -254,9 +254,9 @@
             background-clip: text;
             line-height: 1.05;
             margin-bottom: 10px;
-            filter: drop-shadow(0 4px 16px rgba(212, 175, 55, 0.5));
+            filter: drop-shadow(0 4px 16px rgba(212,175,55,0.5));
         }
-        
+
         .hero-divider {
             display: flex;
             align-items: center;
@@ -264,47 +264,34 @@
             gap: 10px;
             margin-bottom: 10px;
         }
-        
-        .hero-divider-line {
-            width: 40px;
-            height: 1px;
-            background: var(--gold);
-            opacity: 0.6;
-        }
-        
-        .hero-divider-diamond {
-            width: 8px;
-            height: 8px;
-            background: var(--gold);
-            transform: rotate(45deg);
-        }
-        
+
+        .hero-divider-line { width: 40px; height: 1px; background: var(--gold); opacity: 0.6; }
+        .hero-divider-diamond { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); }
+
         .hero-desc {
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.75);
+            color: rgba(255,255,255,0.75);
             line-height: 1.7;
             margin-bottom: 18px;
         }
+
         /* ─── STATS ROW ─── */
-        
         .stats-row {
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
         }
-        
+
         .stat-item {
             flex: 1;
             max-width: 110px;
             text-align: center;
             padding: 0 12px;
-            border-right: 1px solid rgba(212, 175, 55, 0.2);
+            border-right: 1px solid rgba(212,175,55,0.2);
         }
-        
-        .stat-item:last-child {
-            border-right: none;
-        }
-        
+
+        .stat-item:last-child { border-right: none; }
+
         .stat-num {
             font-size: 22px;
             font-weight: 900;
@@ -314,14 +301,10 @@
             background-clip: text;
             line-height: 1.1;
         }
-        
-        .stat-label {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.55);
-            margin-top: 2px;
-        }
+
+        .stat-label { font-size: 10px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
         /* ─── CTA BUTTON ─── */
-        
         .btn-line {
             display: flex;
             align-items: center;
@@ -337,7 +320,7 @@
             font-size: 20px;
             font-weight: 900;
             font-family: 'Kanit', sans-serif;
-            box-shadow: 0 8px 28px rgba(212, 175, 55, 0.55), 0 2px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 28px rgba(212,175,55,0.55), 0 2px 8px rgba(0,0,0,0.3);
             animation: ctaPulse 2s ease-in-out infinite;
             gap: 12px;
             position: relative;
@@ -345,72 +328,50 @@
             cursor: pointer;
             border: none;
         }
-        
+
         .btn-line::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
+            top: 0; left: -100%;
             width: 60%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             animation: shimmer 2.5s ease-in-out infinite;
         }
-        
-        @keyframes shimmer {
-            0% {
-                left: -100%;
-            }
-            100% {
-                left: 200%;
-            }
-        }
-        
+
+        @keyframes shimmer { 0% { left: -100%; } 100% { left: 200%; } }
+
         @keyframes ctaPulse {
-            0%,
-            100% {
-                box-shadow: 0 8px 28px rgba(212, 175, 55, 0.55), 0 2px 8px rgba(0, 0, 0, 0.3);
-                transform: scale(1);
-            }
-            50% {
-                box-shadow: 0 12px 40px rgba(212, 175, 55, 0.75), 0 4px 12px rgba(0, 0, 0, 0.3);
-                transform: scale(1.02);
-            }
+            0%, 100% { box-shadow: 0 8px 28px rgba(212,175,55,0.55), 0 2px 8px rgba(0,0,0,0.3); transform: scale(1); }
+            50% { box-shadow: 0 12px 40px rgba(212,175,55,0.75), 0 4px 12px rgba(0,0,0,0.3); transform: scale(1.02); }
         }
-        
+
         .line-circle {
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             background: #fff;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
-        
-        .line-circle svg {
-            width: 22px;
-            height: 22px;
-            fill: #06C755;
-        }
-        
+
+        .line-circle svg { width: 22px; height: 22px; fill: #06C755; }
+
         .btn-sub {
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.45);
+            color: rgba(255,255,255,0.45);
             text-align: center;
             margin-top: 8px;
         }
+
         /* ─── FEATURES ─── */
-        
         .features-section {
             background: #fff;
             margin: 20px 16px 0;
             border-radius: 20px;
             padding: 20px 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
-        
+
         .section-title {
             font-size: 14px;
             font-weight: 700;
@@ -418,307 +379,166 @@
             text-align: center;
             margin-bottom: 14px;
         }
-        
+
         .feature-item {
             display: flex;
             align-items: center;
             gap: 14px;
             padding: 12px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+            border-bottom: 1px solid rgba(0,0,0,0.07);
         }
-        
-        .feature-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        
-        .feature-item:first-child {
-            padding-top: 0;
-        }
-        
+
+        .feature-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .feature-item:first-child { padding-top: 0; }
+
         .feature-icon {
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             border-radius: 50%;
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        
-        .feature-icon svg {
-            width: 22px;
-            height: 22px;
-            fill: var(--gold);
-        }
-        
-        .feature-text h3 {
-            font-size: 15px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 2px;
-        }
-        
-        .feature-text p {
-            font-size: 12px;
-            color: #666;
-            line-height: 1.5;
-        }
+
+        .feature-icon svg { width: 22px; height: 22px; fill: var(--gold); }
+
+        .feature-text h3 { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 2px; }
+        .feature-text p { font-size: 12px; color: #666; line-height: 1.5; }
+
         /* ─── MID CTA ─── */
-        
-        .cta-mid {
-            padding: 20px 16px 0;
-        }
+        .cta-mid { padding: 20px 16px 0; }
+
         /* ─── LIVE FEED ─── */
-        
-        .live-section {
-            padding: 20px 16px 0;
-        }
-        
+        .live-section { padding: 20px 16px 0; }
+
         .live-header {
             display: flex;
             align-items: center;
             gap: 8px;
             margin-bottom: 10px;
         }
-        
+
         .live-dot {
-            width: 10px;
-            height: 10px;
+            width: 10px; height: 10px;
             border-radius: 50%;
             background: #ff3b3b;
             animation: blink 1.2s ease-in-out infinite;
         }
-        
-        .live-badge {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: #ff3b3b;
-            text-transform: uppercase;
-        }
-        
-        .live-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.65);
-            margin-left: auto;
-        }
-        
+
+        .live-badge { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #ff3b3b; text-transform: uppercase; }
+        .live-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.65); margin-left: auto; }
+
         .live-box {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(212, 175, 55, 0.15);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(212,175,55,0.15);
             border-radius: 14px;
             overflow: hidden;
             height: 168px;
             position: relative;
         }
-        
-        .live-list {
-            position: absolute;
-            width: 100%;
-            transition: transform 0.5s ease;
-        }
-        
+
+        .live-list { position: absolute; width: 100%; transition: transform 0.5s ease; }
+
         .live-row {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 10px 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             height: 56px;
         }
-        
+
         .live-avatar {
-            width: 34px;
-            height: 34px;
+            width: 34px; height: 34px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; color: #000;
             flex-shrink: 0;
         }
-        
-        .live-info {
-            flex: 1;
-        }
-        
-        .live-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #fff;
-        }
-        
-        .live-phone {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.45);
-        }
-        
-        .live-amount {
-            text-align: right;
-        }
-        
-        .live-amount-num {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--gold);
-        }
-        
-        .live-time {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.35);
-        }
+
+        .live-info { flex: 1; }
+        .live-name { font-size: 13px; font-weight: 600; color: #fff; }
+        .live-phone { font-size: 11px; color: rgba(255,255,255,0.45); }
+        .live-amount { text-align: right; }
+        .live-amount-num { font-size: 14px; font-weight: 700; color: var(--gold); }
+        .live-time { font-size: 10px; color: rgba(255,255,255,0.35); }
+
         /* ─── TRUST ─── */
-        
-        .trust-section {
-            padding: 20px 16px 24px;
-        }
-        
-        .trust-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-        
-        .trust-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            text-align: center;
-        }
-        
+        .trust-section { padding: 20px 16px 24px; }
+
+        .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+        .trust-item { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+
         .trust-icon {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border-radius: 50%;
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: rgba(212,175,55,0.1);
+            border: 1px solid rgba(212,175,55,0.25);
+            display: flex; align-items: center; justify-content: center;
         }
-        
-        .trust-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: var(--gold);
-        }
-        
-        .trust-label {
-            font-size: 10px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.55);
-            line-height: 1.4;
-        }
+
+        .trust-icon svg { width: 20px; height: 20px; fill: var(--gold); }
+        .trust-label { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.55); line-height: 1.4; }
+
         /* ─── STICKY CTA ─── */
-        
         .sticky-cta {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             z-index: 200;
-            background: rgba(10, 10, 10, 0.96);
-            border-top: 1px solid rgba(212, 175, 55, 0.25);
+            background: rgba(10,10,10,0.96);
+            border-top: 1px solid rgba(212,175,55,0.25);
             padding: 10px 16px;
             padding-bottom: calc(10px + env(safe-area-inset-bottom));
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
-        
-        .sticky-cta .btn-line {
-            padding: 15px 20px;
-            font-size: 18px;
-        }
+
+        .sticky-cta .btn-line { padding: 15px 20px; font-size: 18px; }
+
         /* ─── TOAST ─── */
-        
         #toastContainer {
             position: fixed;
-            bottom: 90px;
-            left: 16px;
+            bottom: 90px; left: 16px;
             z-index: 9999;
             pointer-events: none;
         }
-        
+
         .toast-review {
-            background: rgba(20, 15, 0, 0.96);
-            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(20,15,0,0.96);
+            border: 1px solid rgba(212,175,55,0.3);
             border-radius: 14px;
             padding: 12px 14px;
             display: flex;
             align-items: center;
             gap: 10px;
             width: 270px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             opacity: 0;
             transform: translateY(20px) scale(0.95);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        
-        .toast-review.show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-        
-        .toast-review.hide {
-            opacity: 0;
-            transform: translateY(-16px) scale(0.95);
-            transition: all 0.3s ease-in;
-        }
-        
+
+        .toast-review.show { opacity: 1; transform: translateY(0) scale(1); }
+        .toast-review.hide { opacity: 0; transform: translateY(-16px) scale(0.95); transition: all 0.3s ease-in; }
+
         .toast-avatar {
-            width: 38px;
-            height: 38px;
+            width: 38px; height: 38px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--gold-dark), var(--gold));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: 700;
-            color: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700; color: #000;
             flex-shrink: 0;
         }
-        
-        .toast-body {
-            flex: 1;
-        }
-        
-        .toast-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 2px;
-        }
-        
-        .toast-stars {
-            color: var(--gold);
-            font-size: 11px;
-            margin-bottom: 2px;
-        }
-        
-        .toast-msg {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.65);
-            line-height: 1.4;
-        }
-        
-        .toast-time {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.35);
-            white-space: nowrap;
-            align-self: flex-start;
-        }
+
+        .toast-body { flex: 1; }
+        .toast-name { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .toast-stars { color: var(--gold); font-size: 11px; margin-bottom: 2px; }
+        .toast-msg { font-size: 11px; color: rgba(255,255,255,0.65); line-height: 1.4; }
+        .toast-time { font-size: 10px; color: rgba(255,255,255,0.35); white-space: nowrap; align-self: flex-start; }
     </style>
 </head>
-
 <body>
 
     <!-- URGENCY BANNER -->
@@ -733,11 +553,12 @@
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <div class="logo-wrap">
-                <img src="logo-yx888.png" alt="Yellowx888 Logo" width="80" height="80" />
+                <img src="logo-yellow.png" alt="Yellow Official Logo" width="80" height="80" style="border-radius:0;background:transparent;" />
             </div>
-            <div class="brand-name">YellowX</div>
+            <div class="brand-name">Yellow Official</div>
             <div class="brand-badge">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> PREMIUM — จากดูไบ
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                PREMIUM — จากดูไบ
             </div>
             <h1 class="hero-title">ระบบมาตรฐานสากล</h1>
             <span class="hero-title-gold">จากดูไบ</span>
@@ -765,7 +586,11 @@
             </div>
 
             <!-- ABOVE-FOLD CTA -->
-            <a href="order.html" class="btn-line" onclick="event.preventDefault(); tdTracking.goWithTrack('order.html', 'ViewContent', 'InitiateCheckout');">
+            <a
+                href="order.html"
+                class="btn-line"
+                onclick="event.preventDefault(); tdTracking.goWithTrack('order.html', 'ViewContent');"
+            >
                 <div class="line-circle">
                     <svg viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.047c-.052.312-.252 1.217 1.089.665 1.341-.553 7.235-4.261 9.871-7.298 1.914-2.128 2.079-4.01 2.079-5.7z"/></svg>
                 </div>
@@ -777,7 +602,7 @@
 
     <!-- FEATURES -->
     <div class="features-section">
-        <div class="section-title">ทำไมต้อง YellowX?</div>
+        <div class="section-title">ทำไมต้อง Yellow Official?</div>
         <div class="feature-item">
             <div class="feature-icon">
                 <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
@@ -809,7 +634,11 @@
 
     <!-- MID CTA -->
     <div class="cta-mid">
-        <a href="order.html" class="btn-line" onclick="event.preventDefault(); tdTracking.goWithTrack('order.html', 'AddToWishlist', 'AddToWishlist');">
+        <a
+            href="order.html"
+            class="btn-line"
+            onclick="event.preventDefault(); tdTracking.goWithTrack('order.html', 'AddToWishlist');"
+        >
             <div class="line-circle">
                 <svg viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.047c-.052.312-.252 1.217 1.089.665 1.341-.553 7.235-4.261 9.871-7.298 1.914-2.128 2.079-4.01 2.079-5.7z"/></svg>
             </div>
@@ -864,7 +693,11 @@
 
     <!-- STICKY CTA -->
     <div class="sticky-cta">
-        <a href="order.html" class="btn-line" onclick="event.preventDefault(); tdTracking.goWithTrack('order.html', 'CompleteRegistration', 'Contact');">
+        <a
+            href="order.html"
+            class="btn-line"
+            onclick="event.preventDefault(); tdTracking.goWithTrack('order.html', 'ClickButton');"
+        >
             <div class="line-circle">
                 <svg viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.121.303.079.778.039 1.085l-.171 1.047c-.052.312-.252 1.217 1.089.665 1.341-.553 7.235-4.261 9.871-7.298 1.914-2.128 2.079-4.01 2.079-5.7z"/></svg>
             </div>
@@ -873,63 +706,50 @@
     </div>
 
     <script>
-        // ─── URGENCY SLOTS ───
-        (function() {
-            let slots = 7 + Math.floor(Math.random() * 4);
-            const el = document.getElementById("slotsLeft");
-            el.textContent = String(slots);
-            setInterval(() => {
-                if (slots > 2 && Math.random() < 0.3) {
-                    slots--;
-                    el.textContent = String(slots);
-                }
-            }, 18000);
-        })();
-
-        // ─── LIVE FEED ───
-        (function() {
-            const names = ["สมชาย ว.", "อนันต์ ก.", "ปิยะ ส.", "วิชัย น.", "ธนา ร.", "ณัฐ ม.", "กิตติ ป.", "ชาญ อ.", "วรา ท.", "สุรชัย จ.", "พิชัย ล.", "ธีร์ ข.", "ภาณุ ศ.", "ปรีชา ห.", "สมศักดิ์ ด.", "อภิชาต ย.", "ไพโรจน์ ฉ.", "ณัฐพล ว.", "สุทธิ บ.", "ชัยวัฒน์ ค."];
-            const phones = ["08x-xxx-", "09x-xxx-", "06x-xxx-"];
-            const amounts = [500, 800, 1000, 1200, 1500, 2000, 2500, 3000, 3500, 4000, 5000, 6000, 7500, 8000, 10000, 12000, 15000, 20000];
-            const times = ["เมื่อกี้", "1 นาทีที่แล้ว", "2 นาทีที่แล้ว", "3 นาทีที่แล้ว", "5 นาทีที่แล้ว", "7 นาทีที่แล้ว", "10 นาทีที่แล้ว", "15 นาทีที่แล้ว"];
-
-            function rand(arr) {
-                return arr[Math.floor(Math.random() * arr.length)];
+    // ─── URGENCY SLOTS ───
+    (function () {
+        let slots = 7 + Math.floor(Math.random() * 4);
+        const el = document.getElementById("slotsLeft");
+        el.textContent = String(slots);
+        setInterval(() => {
+            if (slots > 2 && Math.random() < 0.3) {
+                slots--;
+                el.textContent = String(slots);
             }
+        }, 18000);
+    })();
 
-            function randPhone() {
-                return rand(phones) + String(Math.floor(Math.random() * 9000) + 1000);
+    // ─── LIVE FEED ───
+    (function () {
+        const names = ["สมชาย ว.","อนันต์ ก.","ปิยะ ส.","วิชัย น.","ธนา ร.","ณัฐ ม.","กิตติ ป.","ชาญ อ.","วรา ท.","สุรชัย จ.","พิชัย ล.","ธีร์ ข.","ภาณุ ศ.","ปรีชา ห.","สมศักดิ์ ด.","อภิชาต ย.","ไพโรจน์ ฉ.","ณัฐพล ว.","สุทธิ บ.","ชัยวัฒน์ ค."];
+        const phones = ["08x-xxx-","09x-xxx-","06x-xxx-"];
+        const amounts = [500,800,1000,1200,1500,2000,2500,3000,3500,4000,5000,6000,7500,8000,10000,12000,15000,20000];
+        const times = ["เมื่อกี้","1 นาทีที่แล้ว","2 นาทีที่แล้ว","3 นาทีที่แล้ว","5 นาทีที่แล้ว","7 นาทีที่แล้ว","10 นาทีที่แล้ว","15 นาทีที่แล้ว"];
+
+        function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function randPhone() { return rand(phones) + String(Math.floor(Math.random() * 9000) + 1000); }
+        function randAmount() { return "฿" + rand(amounts).toLocaleString(); }
+
+        function generateRows(count) {
+            const rows = [];
+            for (let i = 0; i < count; i++) {
+                rows.push({ name: rand(names), phone: randPhone(), amount: randAmount(), time: rand(times) });
             }
+            return rows;
+        }
 
-            function randAmount() {
-                return "฿" + rand(amounts).toLocaleString();
-            }
+        const list = document.getElementById("liveList");
+        const ROW_H = 56;
+        const VISIBLE = 3;
+        let rows = generateRows(20);
+        let offset = 0;
 
-            function generateRows(count) {
-                const rows = [];
-                for (let i = 0; i < count; i++) {
-                    rows.push({
-                        name: rand(names),
-                        phone: randPhone(),
-                        amount: randAmount(),
-                        time: rand(times)
-                    });
-                }
-                return rows;
-            }
-
-            const list = document.getElementById("liveList");
-            const ROW_H = 56;
-            const VISIBLE = 3;
-            let rows = generateRows(20);
-            let offset = 0;
-
-            function renderRows() {
-                list.innerHTML = "";
-                [...rows, ...rows.slice(0, VISIBLE)].forEach(r => {
-                    const div = document.createElement("div");
-                    div.className = "live-row";
-                    div.innerHTML = `
+        function renderRows() {
+            list.innerHTML = "";
+            [...rows, ...rows.slice(0, VISIBLE)].forEach(r => {
+                const div = document.createElement("div");
+                div.className = "live-row";
+                div.innerHTML = `
                     <div class="live-avatar">${r.name.charAt(0)}</div>
                     <div class="live-info">
                         <div class="live-name">${r.name}</div>
@@ -939,80 +759,55 @@
                         <div class="live-amount-num">${r.amount}</div>
                         <div class="live-time">${r.time}</div>
                     </div>`;
-                    list.appendChild(div);
-                });
-            }
+                list.appendChild(div);
+            });
+        }
 
-            renderRows();
+        renderRows();
 
-            setInterval(() => {
-                offset++;
-                if (offset >= rows.length) {
-                    offset = 0;
-                    list.style.transition = "none";
-                    list.style.transform = "translateY(0)";
-                    setTimeout(() => {
-                        list.style.transition = "transform 0.5s ease";
-                        list.style.transform = `translateY(-${ROW_H}px)`;
-                        offset = 1;
-                    }, 50);
-                } else {
+        setInterval(() => {
+            offset++;
+            if (offset >= rows.length) {
+                offset = 0;
+                list.style.transition = "none";
+                list.style.transform = "translateY(0)";
+                setTimeout(() => {
                     list.style.transition = "transform 0.5s ease";
-                    list.style.transform = `translateY(-${offset * ROW_H}px)`;
-                }
-            }, 2800);
-        })();
-
-        // ─── TOAST REVIEW ───
-        (function() {
-            const reviews = [{
-                name: "สมชาย ก.",
-                stars: 5,
-                msg: "ระบบดีมาก ทำรายการไวมาก ประทับใจครับ"
-            }, {
-                name: "วิภา ส.",
-                stars: 5,
-                msg: "ทีมงานดูแลดีมาก ตอบไวทุกคำถาม"
-            }, {
-                name: "อนันต์ ร.",
-                stars: 5,
-                msg: "ใช้งานง่าย ระบบเสถียรดีมากเลยครับ"
-            }, {
-                name: "ปิยะ น.",
-                stars: 5,
-                msg: "ไม่มีสะดุดเลย ดีกว่าที่เก่ามากครับ"
-            }, {
-                name: "ธนา ม.",
-                stars: 5,
-                msg: "มาตรฐานดูไบจริงๆ ประทับใจมากครับ"
-            }, {
-                name: "ณัฐ ล.",
-                stars: 5,
-                msg: "บริการดีเยี่ยม แนะนำให้เพื่อนมาใช้แล้ว"
-            }, {
-                name: "กิตติ ว.",
-                stars: 5,
-                msg: "ระบบนอกจริง ไม่มีปัญหาเลยครับ"
-            }, {
-                name: "วรา ป.",
-                stars: 5,
-                msg: "ดีที่สุดเท่าที่เคยใช้มาเลยครับ"
-            }, ];
-            const times = ["เมื่อกี้", "1 นาทีที่แล้ว", "2 นาทีที่แล้ว", "3 นาทีที่แล้ว", "5 นาทีที่แล้ว"];
-
-            function rand(arr) {
-                return arr[Math.floor(Math.random() * arr.length)];
+                    list.style.transform = `translateY(-${ROW_H}px)`;
+                    offset = 1;
+                }, 50);
+            } else {
+                list.style.transition = "transform 0.5s ease";
+                list.style.transform = `translateY(-${offset * ROW_H}px)`;
             }
+        }, 2800);
+    })();
 
-            const container = document.getElementById("toastContainer");
-            let idx = 0;
+    // ─── TOAST REVIEW ───
+    (function () {
+        const reviews = [
+            { name: "สมชาย ก.", stars: 5, msg: "ระบบดีมาก ทำรายการไวมาก ประทับใจครับ" },
+            { name: "วิภา ส.", stars: 5, msg: "ทีมงานดูแลดีมาก ตอบไวทุกคำถาม" },
+            { name: "อนันต์ ร.", stars: 5, msg: "ใช้งานง่าย ระบบเสถียรดีมากเลยครับ" },
+            { name: "ปิยะ น.", stars: 5, msg: "ไม่มีสะดุดเลย ดีกว่าที่เก่ามากครับ" },
+            { name: "ธนา ม.", stars: 5, msg: "มาตรฐานดูไบจริงๆ ประทับใจมากครับ" },
+            { name: "ณัฐ ล.", stars: 5, msg: "บริการดีเยี่ยม แนะนำให้เพื่อนมาใช้แล้ว" },
+            { name: "กิตติ ว.", stars: 5, msg: "ระบบนอกจริง ไม่มีปัญหาเลยครับ" },
+            { name: "วรา ป.", stars: 5, msg: "ดีที่สุดเท่าที่เคยใช้มาเลยครับ" },
+        ];
+        const times = ["เมื่อกี้","1 นาทีที่แล้ว","2 นาทีที่แล้ว","3 นาทีที่แล้ว","5 นาทีที่แล้ว"];
 
-            function showToast() {
-                const r = reviews[idx % reviews.length];
-                idx++;
-                const el = document.createElement("div");
-                el.className = "toast-review";
-                el.innerHTML = `
+        function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+        const container = document.getElementById("toastContainer");
+        let idx = 0;
+
+        function showToast() {
+            const r = reviews[idx % reviews.length];
+            idx++;
+            const el = document.createElement("div");
+            el.className = "toast-review";
+            el.innerHTML = `
                 <div class="toast-avatar">${r.name.charAt(0)}</div>
                 <div class="toast-body">
                     <div class="toast-name">${r.name}</div>
@@ -1020,29 +815,24 @@
                     <div class="toast-msg">${r.msg}</div>
                 </div>
                 <div class="toast-time">${rand(times)}</div>`;
-                container.appendChild(el);
+            container.appendChild(el);
 
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        el.classList.add("show");
-                    });
-                });
-
-                setTimeout(() => {
-                    el.classList.add("hide");
-                    setTimeout(() => {
-                        el.remove();
-                    }, 400);
-                }, 4000);
-            }
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => { el.classList.add("show"); });
+            });
 
             setTimeout(() => {
-                showToast();
-                setInterval(showToast, 5500);
-            }, 1500);
-        })();
+                el.classList.add("hide");
+                setTimeout(() => { el.remove(); }, 400);
+            }, 4000);
+        }
+
+        setTimeout(() => {
+            showToast();
+            setInterval(showToast, 5500);
+        }, 1500);
+    })();
     </script>
 
 </body>
-
 </html>
