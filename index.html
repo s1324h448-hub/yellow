@@ -105,7 +105,7 @@
             };
             ttq.load(PIXEL_ID);
             ttq.identify({ external_id: externalId });
-            ttq.page();
+            // ttq.page() ถูกลบออก — ใช้ sendTTCAPI("Pageview") แทน เพื่อ dedup ด้วย event_id
         }(window, document, "ttq");
     })();
     </script>
