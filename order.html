@@ -33,12 +33,15 @@
         const externalId = getOrCreateEid();
         const ttclid = captureTtclid();
 
+        var _lineRedirected = false;
         window.tdTracking = {
             externalId, ttclid,
             goToLine: function (url) {
+                if (_lineRedirected) return; // ป้องกันยิงซ้ำ
+                _lineRedirected = true;
                 if (typeof ttq !== "undefined") {
                     ttq.track("Lead", { external_id: externalId, ttclid: ttclid || undefined });
-                    ttq.track("CompleteRegistration", { external_id: externalId, ttclid: ttclid || undefined });
+                    // ลบ CompleteRegistration — ใช้ Lead เดียวเป็น conversion
                 }
                 const target = new URL(url);
                 if (ttclid) target.searchParams.set("ttclid", ttclid);
@@ -60,7 +63,7 @@
             };
             ttq.load(PIXEL_ID);
             ttq.identify({ external_id: externalId });
-            ttq.page();
+            // ttq.page() ถูกลบออก — ไม่ต้องนับ Pageview ซ้ำ
         }(window, document, "ttq");
     })();
     </script>
