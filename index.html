@@ -48,11 +48,13 @@
         function sendTTCAPI(eventName) {
             try {
                 const eventId = eventName + "_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+                var contents = [];
+                if (eventName === "ViewContent" || eventName === "AddToWishlist") {
+                    contents = [{ content_id: "yellow-official-offer", content_type: "product", content_name: "Yellow Official" }];
+                }
                 if (typeof ttq !== "undefined") {
                     var props = { external_id: externalId, ttclid: ttclid || undefined, event_id: eventId };
-                    if (eventName === "ViewContent") {
-                        props.contents = [{ content_id: "yellow-official-offer", content_type: "product", content_name: "Yellow Official" }];
-                    }
+                    if (contents.length > 0) props.contents = contents;
                     ttq.track(eventName, props);
                 }
                 fetch("/api/tt-capi", {
@@ -63,6 +65,7 @@
                         event_time: Math.floor(Date.now() / 1000),
                         event_id: eventId,
                         event_source_url: window.location.href,
+                        contents: contents,
                         user_data: {
                             ttclid: ttclid || "",
                             external_id: externalId,
