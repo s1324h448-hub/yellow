@@ -45,19 +45,20 @@
         const ttclid = captureTtclid();
 
         // ─── TikTok Events API (Server-side) ───
-        function sendTTCAPI(eventName) {
+        function sendTTCAPI(eventName, eventId) {
             try {
-                const eventId = eventName + "_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
                 var contents = [];
                 if (eventName === "ViewContent" || eventName === "AddToWishlist") {
                     contents = [{ content_id: "yellow-official-offer", content_type: "product", content_name: "Yellow Official" }];
                 }
+                // TikTok Pixel (Browser-side)
                 if (typeof ttq !== "undefined") {
                     var props = { external_id: externalId, ttclid: ttclid || undefined, event_id: eventId };
                     if (contents.length > 0) props.contents = contents;
                     ttq.track(eventName, props);
                 }
-                fetch("/api/tt-capi", {
+                // Return fetch promise so we can await it
+                return fetch("/api/tt-capi", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -65,6 +66,7 @@
                         event_time: Math.floor(Date.now() / 1000),
                         event_id: eventId,
                         event_source_url: window.location.href,
+                        test_event_code: new URLSearchParams(window.location.search).get("test_event_code") || undefined, // ส่ง test_event_code ไปด้วย
                         contents: contents,
                         user_data: {
                             ttclid: ttclid || "",
@@ -73,22 +75,40 @@
                         }
                     })
                 }).catch(function(e) { console.warn("TT CAPI error:", e); });
-            } catch(e) { console.warn("TT CAPI send error:", e); }
+            } catch(e) { 
+                console.warn("TT CAPI send error:", e);
+                return Promise.resolve();
+            }
         }
 
-        window.addEventListener("load", function() { sendTTCAPI("Pageview"); });
+        window.addEventListener("load", function() {
+            const eventId = "Pageview_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+            sendTTCAPI("Pageview", eventId);
+        });
 
         window.tdTracking = {
             externalId, ttclid,
             track: function (ttEv) {
-                sendTTCAPI(ttEv);
+                const eventId = ttEv + "_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+                sendTTCAPI(ttEv, eventId);
             },
-            goWithTrack: function (url, ttEv) {
-                sendTTCAPI(ttEv || "ClickButton");
+            goWithTrack: async function (url, ttEv) {
+                if (window.__tdClicked) return;
+                window.__tdClicked = true;
                 const target = new URL(url, window.location.href);
                 if (ttclid) target.searchParams.set("ttclid", ttclid);
                 if (externalId) target.searchParams.set("external_id", externalId);
-                setTimeout(() => { window.location.href = target.toString(); }, 300);
+                const testEventCode = new URLSearchParams(window.location.search).get("test_event_code");
+                if (testEventCode) target.searchParams.set("test_event_code", testEventCode);
+                const eventId = (ttEv || "ClickButton") + "_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+                try {
+                    await sendTTCAPI(ttEv || "ClickButton", eventId);
+                } catch (e) {
+                    console.warn("Tracking error before redirect:", e);
+                }
+                setTimeout(() => {
+                    window.location.href = target.toString();
+                }, 800);
             }
         };
 

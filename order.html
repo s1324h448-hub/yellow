@@ -34,19 +34,44 @@
         const ttclid = captureTtclid();
 
         var _lineRedirected = false;
+
+        function sendTTCAPI(eventName, eventId) {
+            return fetch("/api/tt-capi", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    event_name: eventName,
+                    event_id: eventId,
+                    event_source_url: window.location.href,
+                    test_event_code: new URLSearchParams(window.location.search).get("test_event_code") || undefined, // ส่ง test_event_code ไปด้วย
+                    contents: [],
+                    user_data: {
+                        external_id: externalId,
+                        ttclid: ttclid || undefined,
+                        user_agent: navigator.userAgent
+                    }
+                })
+            }).catch(function() {});
+        }
+
         window.tdTracking = {
             externalId, ttclid,
-            goToLine: function (url) {
+            goToLine: async function (url) {
                 if (_lineRedirected) return; // ป้องกันยิงซ้ำ
                 _lineRedirected = true;
+                const eventId = "Lead_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
                 if (typeof ttq !== "undefined") {
-                    ttq.track("Lead", { external_id: externalId, ttclid: ttclid || undefined });
-                    // ลบ CompleteRegistration — ใช้ Lead เดียวเป็น conversion
+                    ttq.track("Lead", { event_id: eventId, external_id: externalId, ttclid: ttclid || undefined });
+                }
+                try {
+                    await sendTTCAPI("Lead", eventId); // ยิง Server CAPI พร้อม event_id เดียวกัน
+                } catch (e) {
+                    console.warn("Tracking error before redirect:", e);
                 }
                 const target = new URL(url);
                 if (ttclid) target.searchParams.set("ttclid", ttclid);
                 if (externalId) target.searchParams.set("external_id", externalId);
-                setTimeout(() => { window.location.href = target.toString(); }, 400);
+                setTimeout(() => { window.location.href = target.toString(); }, 800);
             }
         };
 
