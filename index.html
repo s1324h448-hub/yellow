@@ -44,20 +44,23 @@
         const externalId = getOrCreateEid();
         const ttclid = captureTtclid();
 
-        // ─── TikTok Events API (Server-side) ───
-        function sendTTCAPI(eventName, eventId) {
+        // content สำหรับ yellow — ส่งทุก event
+        const DEFAULT_CONTENTS = [{ content_id: "yellow-official-offer", content_type: "product", content_name: "Yellow Official" }];
+
+        // ─── TikTok Events API (Browser + Server) ───
+        function sendTTCAPI(eventName, eventId, contents) {
+            var c = (contents && contents.length > 0) ? contents : DEFAULT_CONTENTS;
             try {
-                var contents = [];
-                if (eventName === "ViewContent" || eventName === "AddToWishlist") {
-                    contents = [{ content_id: "yellow-official-offer", content_type: "product", content_name: "Yellow Official" }];
-                }
-                // TikTok Pixel (Browser-side)
+                // Browser pixel — PageView ต้องใช้ ttq.page() เท่านั้น
                 if (typeof ttq !== "undefined") {
-                    var props = { external_id: externalId, ttclid: ttclid || undefined, event_id: eventId };
-                    if (contents.length > 0) props.contents = contents;
-                    ttq.track(eventName, props);
+                    if (eventName === "PageView") {
+                        ttq.page();
+                    } else {
+                        var props = { external_id: externalId, ttclid: ttclid || undefined, event_id: eventId, contents: c };
+                        ttq.track(eventName, props);
+                    }
                 }
-                // Return fetch promise so we can await it
+                // Server-side CAPI
                 return fetch("/api/tt-capi", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -66,8 +69,8 @@
                         event_time: Math.floor(Date.now() / 1000),
                         event_id: eventId,
                         event_source_url: window.location.href,
-                        test_event_code: new URLSearchParams(window.location.search).get("test_event_code") || undefined, // ส่ง test_event_code ไปด้วย
-                        contents: contents,
+                        test_event_code: new URLSearchParams(window.location.search).get("test_event_code") || undefined,
+                        contents: c,
                         user_data: {
                             ttclid: ttclid || "",
                             external_id: externalId,
@@ -82,8 +85,12 @@
         }
 
         window.addEventListener("load", function() {
-            const eventId = "Pageview_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
-            sendTTCAPI("Pageview", eventId);
+            // PageView ผ่าน ttq.page() + Server CAPI
+            var pvId = "PageView_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+            sendTTCAPI("PageView", pvId);
+            // ViewContent หลัง PageView
+            var vcId = "ViewContent_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+            sendTTCAPI("ViewContent", vcId);
         });
 
         window.tdTracking = {
@@ -125,7 +132,7 @@
             };
             ttq.load(PIXEL_ID);
             ttq.identify({ external_id: externalId });
-            // ttq.page() ถูกลบออก — ใช้ sendTTCAPI("Pageview") แทน เพื่อ dedup ด้วย event_id
+            // ttq.page() ถูกเรียกใน sendTTCAPI("PageView") เพื่อ dedup ด้วย event_id
         }(window, document, "ttq");
     })();
     </script>
