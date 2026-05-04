@@ -20,7 +20,9 @@ export default async function handler(req, res) {
             event_time,
             event_id,
             event_source_url,
-            user_data = {}
+            contents = [],
+            user_data = {},
+            test_event_code
         } = body;
 
         if (!event_name) return res.status(400).json({ error: "event_name required" });
@@ -43,24 +45,34 @@ export default async function handler(req, res) {
             if (ua) ttUserData.user_agent = ua;
         }
 
+        // TikTok Events API v1.3 — ใช้ event_source_id + data array (format ถูกต้อง)
+        const payload = {
+            event_source: "web",
+            event_source_id: TT_PIXEL_ID,
+            test_event_code: test_event_code || undefined,
+            data: [
+                {
+                    event: event_name,
+                    event_time: event_time || Math.floor(Date.now() / 1000),
+                    event_id: event_id || `${event_name}_${Date.now()}`,
+                    event_source_url: event_source_url || "",
+                    user: ttUserData,
+                    properties: contents.length > 0 ? { contents } : {}
+                }
+            ]
+        };
+
         const ttRes = await fetch(TT_API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "Access-Token": TT_ACCESS_TOKEN
             },
-            body: JSON.stringify({
-                pixel_code: TT_PIXEL_ID,
-                event: event_name,
-                event_time: event_time || Math.floor(Date.now() / 1000),
-                event_id: event_id || `${event_name}_${Date.now()}`,
-                event_source_url: event_source_url || "",
-                user: ttUserData,
-                properties: {}
-            })
+            body: JSON.stringify(payload)
         });
 
         const ttData = await ttRes.json();
+        console.log("TikTok CAPI response:", JSON.stringify(ttData));
         return res.status(200).json({ ok: true, tt: ttData });
 
     } catch (err) {
