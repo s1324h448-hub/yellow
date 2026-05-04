@@ -65,12 +65,10 @@
             } catch(e) { return Promise.resolve(); }
         }
 
-        // ยิง PageView + ViewContent + SubmitForm ตอนโหลดหน้า
+        // ยิง PageView + SubmitForm ตอนโหลดหน้า (ไม่ยิง ViewContent ซ้ำ เพราะ Landing ยิงไปแล้ว)
         window.addEventListener("load", function() {
             var pvId = "PageView_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
             sendTTCAPI("PageView", pvId);
-            var vcId = "ViewContent_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
-            sendTTCAPI("ViewContent", vcId);
             var sfId = "SubmitForm_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
             sendTTCAPI("SubmitForm", sfId);
         });
